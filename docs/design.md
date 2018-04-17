@@ -21,6 +21,8 @@ Control the working mode of the system
 
 Receive key events from FPGA
 
+Play the music using PC speaker
+
 Extend function: recognize the music using DNN algorithms
 
 Send music scores to the FPGA
