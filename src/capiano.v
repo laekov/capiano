@@ -34,23 +34,25 @@ module capiano(
 		.out_clk(qu_clk)
 	);
 
+	wire [31:0] vga_addr;
 	vga_ctrl __vga_ctrl(
-		.clk(clk),
-		.rst(rst),
+		.clk(qu_clk),
+		.rst(!rst),
 		.hs(vga_hs),
 		.vs(vga_vs),
 		.r(vga_r),
 		.g(vga_g),
-		.b(vga_b)
+		.b(vga_b),
+		.addr(vga_addr)
 	);
 
 	assign debug_out0 = { 1'b0, vga_r };
 	assign debug_out1 = { 1'b0, vga_g };
 	assign debug_out2 = { 1'b0, vga_b };
-	assign debug_out3 = { vga_hs, vga_vs, clk, rst };
-	assign debug_out4 = 4'h4;
-	assign debug_out5 = 4'h5;
-	assign debug_out6 = 4'ha;
-	assign debug_out7 = 4'hc;
+	assign debug_out3 = { 3'b0, vga_hs };
+	assign debug_out4 = { 3'b0, vga_vs };
+	assign debug_out5 = { 3'b0, man_clk };
+	assign debug_out6 = { 3'b0, qu_clk };
+	assign debug_out7 = vga_addr[3:0];
 
 endmodule
