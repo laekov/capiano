@@ -51,7 +51,89 @@ set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulati
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+
+set_location_assignment PIN_A13 -to man_clk
+set_location_assignment PIN_N2 -to clk
+set_location_assignment PIN_N1 -to rst
+
+set_location_assignment PIN_U3 -to vga_hs
+set_location_assignment PIN_U4 -to vga_vs
+
+set_location_assignment PIN_R4 -to vga_r[2]
+set_location_assignment PIN_R3 -to vga_r[1]
+set_location_assignment PIN_R2 -to vga_r[0]
+
+set_location_assignment PIN_T3 -to vga_g[2]
+set_location_assignment PIN_T2 -to vga_g[1]
+set_location_assignment PIN_R5 -to vga_g[0]
+
+set_location_assignment PIN_U1 -to vga_b[2]
+set_location_assignment PIN_U2 -to vga_b[1]
+set_location_assignment PIN_T4 -to vga_b[0]
+
+set_location_assignment PIN_AC7 -to led[0]
+set_location_assignment PIN_AB8 -to led[1]
+set_location_assignment PIN_AC8 -to led[2]
+set_location_assignment PIN_AD8 -to led[3]
+set_location_assignment PIN_AE6 -to led[4]
+set_location_assignment PIN_AF6 -to led[5]
+set_location_assignment PIN_AB10 -to led[6]
+set_location_assignment PIN_AE7 -to led[7]
+set_location_assignment PIN_AF7 -to led[8]
+set_location_assignment PIN_AE8 -to led[9]
+set_location_assignment PIN_AF8 -to led[10]
+set_location_assignment PIN_AC9 -to led[11]
+set_location_assignment PIN_AC10 -to led[12]
+set_location_assignment PIN_AE9 -to led[13]
+set_location_assignment PIN_AF9 -to led[14]
+set_location_assignment PIN_AD10 -to led[15]
+set_location_assignment PIN_AC11 -to led[16]
+set_location_assignment PIN_AB12 -to led[17]
+set_location_assignment PIN_AE10 -to led[18]
+set_location_assignment PIN_AF10 -to led[19]
+set_location_assignment PIN_AD15 -to led[20]
+set_location_assignment PIN_AE11 -to led[21]
+set_location_assignment PIN_AC15 -to led[22]
+set_location_assignment PIN_AD12 -to led[23]
+set_location_assignment PIN_AE12 -to led[24]
+set_location_assignment PIN_AE13 -to led[25]
+set_location_assignment PIN_AF13 -to led[26]
+set_location_assignment PIN_AE15 -to led[27]
+set_location_assignment PIN_AD11 -to led[28]
+set_location_assignment PIN_AB15 -to led[29]
+set_location_assignment PIN_AC12 -to led[30]
+set_location_assignment PIN_AE16 -to led[31]
+set_location_assignment PIN_AD16 -to led[32]
+set_location_assignment PIN_AC16 -to led[33]
+set_location_assignment PIN_AF17 -to led[34]
+set_location_assignment PIN_AE17 -to led[35]
+set_location_assignment PIN_AC17 -to led[36]
+set_location_assignment PIN_AD17 -to led[37]
+set_location_assignment PIN_AF18 -to led[38]
+set_location_assignment PIN_AE18 -to led[39]
+set_location_assignment PIN_AF19 -to led[40]
+set_location_assignment PIN_AE19 -to led[41]
+set_location_assignment PIN_AB18 -to led[42]
+set_location_assignment PIN_AD19 -to led[43]
+set_location_assignment PIN_AC19 -to led[44]
+set_location_assignment PIN_AF20 -to led[45]
+set_location_assignment PIN_AE20 -to led[46]
+set_location_assignment PIN_AB20 -to led[47]
+set_location_assignment PIN_AC20 -to led[48]
+set_location_assignment PIN_AF21 -to led[49]
+set_location_assignment PIN_AD21 -to led[50]
+set_location_assignment PIN_AF22 -to led[51]
+set_location_assignment PIN_AC21 -to led[52]
+set_location_assignment PIN_AE22 -to led[53]
+set_location_assignment PIN_AD22 -to led[54]
+set_location_assignment PIN_AD23 -to led[55]
+
+
+set_global_assignment -name VERILOG_FILE misc/dig_ctrl.v
 set_global_assignment -name VERILOG_FILE displays/vga_ctrl.v
 set_global_assignment -name VERILOG_FILE misc/quarter_clk.v
 set_global_assignment -name VERILOG_FILE capiano.v
+set_global_assignment -name CDF_FILE output_files/Chain3.cdf
+
+
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
