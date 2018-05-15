@@ -7,6 +7,7 @@
 module vga_ctrl(
 	input clk,
 	input rst,
+	input [8:0] q,
 	output wire hs,
 	output wire vs,
 	output wire [2:0] r,
@@ -44,11 +45,16 @@ module vga_ctrl(
 	assign g = (cur_x < `ValidWidth && cur_y < `ValidHeight) ? _g : 3'b0;
 	assign b = (cur_x < `ValidWidth && cur_y < `ValidHeight) ? _b : 3'b0;
 
+	reg [`Coor] b_y;
+	initial begin
+		b_y = 16'd300;
+	end
+
 	always @(*) begin
 		if (hs && vs) begin
-			_r <= (cur_x < 16'd400) ? 3'b111 : 3'b000;
-			_g <= (cur_y < 16'd300) ? 3'b111 : 3'b000;
-			_b <= (cur_x > 16'd300 && cur_y > 16'd300) ? 3'b111 : 3'b000;
+			_r <= q[8:6];
+			_g <= q[5:3];
+			_b <= q[2:0];
 		end else begin
 			_r <= 3'b000;
 			_g <= 3'b000;
