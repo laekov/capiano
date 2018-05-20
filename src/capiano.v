@@ -86,12 +86,54 @@ module capiano(
 		.debug_out(sccb_out),
 		.work_done(sccb_done)
 	);
-
+	
+	wire toread;
+	wire towrite;
+	wire [3:0]res;
+	wire [19:0] mem_addr;
+	wire [31:0] in_data;
+	wire [31:0] back_data;
+	wire [3:0] tststa;
+	wire workdone;
+	
+	ram_test __ramtest(
+		.clk(qu_clk),
+		.rst(rst),
+		.toread(toread),
+		.towrite(towrite),
+		.res(res),
+		.addr(mem_addr),
+		.to_data(in_data),
+		.get_data(back_data),
+		.workdone(workdone),
+		.tststa(tststa)
+	);
+	
+	wire [3:0] ram_sta;
+	wire [3:0] ram_cnt;
+	ram_ctrl __ramctrl(
+		.clk(qu_clk),
+		.rst(rst),
+		.read(toread),
+		.write(towrite),
+		.inp_addr(mem_addr),
+		.inp_data(in_data),
+		.addr(Mem_addr),
+		.data(Mem_data),
+		.CS(Mem_CS),
+		.OE(Mem_OE),
+		.WE(Mem_WE),
+		.workdone(workdone),
+		.out_data(back_data),
+		.nowsta(ram_sta),
+		.nowcnt(ram_cnt)
+	);
+	
 	// debug output from right to left 0 to 7
-	assign debug_out0 = cam_data[3:0];
-	assign debug_out1 = cam_data[7:4];
-	assign debug_out2 = { 3'b0, fifo_rrst };
-	assign debug_out3 = { 3'b0, rclk };
+	assign debug_out0 = res;
+	assign debug_out1 = ram_sta;
+	assign debug_out2 = ram_cnt;
+	assign debug_out3 = tststa;
 	assign debug_out4 = 4'ha;
 	assign debug_out5 = { 2'b0, sccb_out[21:20] };
 	assign debug_out6 = { 3'b0, sccb_out[22] };
