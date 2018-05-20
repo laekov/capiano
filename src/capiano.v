@@ -10,13 +10,13 @@ module capiano(
 	output wire [55:0] led,
 
 	input [7:0] cam_data,
-	input rclk,
 	output wire scl,
 	inout sda,
+	output wire rclk,
 	output wire fifo_wen,
-	input fifo_wrst,
-	input fifo_rrst,
-	input fifo_oe,
+	output wire fifo_wrst,
+	output wire fifo_rrst,
+	output fifo_oe,
 	input ov_vsync
 );
 	wire [3:0] debug_out0;
@@ -62,8 +62,6 @@ module capiano(
 		.clk(qu_clk),
 		.cam_data(cam_data),
 		.rclk(rclk),
-		//.scl(scl),
-		//.sda(sda),
 		.fifo_wen(fifo_wen),
 		.fifo_rrst(fifo_rrst),
 		.fifo_oe(fifo_oe),
@@ -72,22 +70,24 @@ module capiano(
 		.q(vga_data)
 	);
 
-	wire [15:0] sccb_out;
-	sccb_checker __sccb0(
-		.clk(man_clk),
+	wire [23:0] sccb_out;
+	wire sccb_done;
+	wheel_sccb_checker __sccb0(
+		.clk(qu_clk),
 		.rst(rst),
 		.scl(scl),
 		.sda(sda),
-		.debug_out(sccb_out)
+		.debug_out(sccb_out),
+		.work_done(sccb_done)
 	);
 
 	// debug output from right to left 0 to 7
-	assign debug_out0 = sccb_out[3:0];
-	assign debug_out1 = sccb_out[7:4];
-	assign debug_out2 = sccb_out[11:8];
-	assign debug_out3 = sccb_out[15:12];
-	assign debug_out4 = { 3'b0, vga_vs };
-	assign debug_out5 = { 3'b0, man_clk };
-	assign debug_out6 = { 3'b0, qu_clk };
-	assign debug_out7 = vga_addr[3:0];
+	assign debug_out0 = cam_data[3:0];
+	assign debug_out1 = cam_data[7:4];
+	assign debug_out2 = { 3'b0, fifo_rrst };
+	assign debug_out3 = { 3'b0, rclk };
+	assign debug_out4 = 4'ha;
+	assign debug_out5 = { 2'b0, sccb_out[21:20] };
+	assign debug_out6 = { 3'b0, sccb_out[22] };
+	assign debug_out7 = { 3'b0, sccb_out[23] };
 endmodule
