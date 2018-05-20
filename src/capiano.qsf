@@ -146,14 +146,68 @@ set_location_assignment PIN_C19 -to fifo_rrst
 set_location_assignment PIN_C17 -to fifo_oe
 set_location_assignment PIN_D15 -to ov_vsync
 
-
-
-
+set_location_assignment PIN_AE23 -to Mem_addr[19]
+set_location_assignment PIN_AF23 -to Mem_addr[18]
+set_location_assignment PIN_Y23 -to Mem_addr[17]
+set_location_assignment PIN_Y24 -to Mem_addr[16]
+set_location_assignment PIN_AA25 -to Mem_addr[15]
+set_location_assignment PIN_AA26 -to Mem_addr[14]
+set_location_assignment PIN_V22 -to Mem_addr[13]
+set_location_assignment PIN_AB26 -to Mem_addr[12]
+set_location_assignment PIN_AB25 -to Mem_addr[11]
+set_location_assignment PIN_AB23 -to Mem_addr[10]
+set_location_assignment PIN_AE24 -to Mem_addr[9]
+set_location_assignment PIN_AA23 -to Mem_addr[8]
+set_location_assignment PIN_AA24 -to Mem_addr[7]
+set_location_assignment PIN_Y22 -to Mem_addr[6]
+set_location_assignment PIN_AC24 -to Mem_addr[5]
+set_location_assignment PIN_AD24 -to Mem_addr[4]
+set_location_assignment PIN_AC26 -to Mem_addr[3]
+set_location_assignment PIN_AC23 -to Mem_addr[2]
+set_location_assignment PIN_N23 -to Mem_addr[1]
+set_location_assignment PIN_N24 -to Mem_addr[0]
+set_location_assignment PIN_AB21 -to Mem_CS
+set_location_assignment PIN_M25 -to Mem_data[31]
+set_location_assignment PIN_M24 -to Mem_data[30]
+set_location_assignment PIN_M23 -to Mem_data[29]
+set_location_assignment PIN_M23 -to Mem_data[28]
+set_location_assignment PIN_K23 -to Mem_data[27]
+set_location_assignment PIN_K22 -to Mem_data[26]
+set_location_assignment PIN_K24 -to Mem_data[25]
+set_location_assignment PIN_L23 -to Mem_data[24]
+set_location_assignment PIN_L24 -to Mem_data[23]
+set_location_assignment PIN_P23 -to Mem_data[22]
+set_location_assignment PIN_P24 -to Mem_data[21]
+set_location_assignment PIN_R25 -to Mem_data[20]
+set_location_assignment PIN_R24 -to Mem_data[19]
+set_location_assignment PIN_T22 -to Mem_data[18]
+set_location_assignment PIN_T23 -to Mem_data[17]
+set_location_assignment PIN_T24 -to Mem_data[16]
+set_location_assignment PIN_T25 -to Mem_data[15]
+set_location_assignment PIN_U26 -to Mem_data[14]
+set_location_assignment PIN_U25 -to Mem_data[13]
+set_location_assignment PIN_U23 -to Mem_data[12]
+set_location_assignment PIN_U24 -to Mem_data[11]
+set_location_assignment PIN_V26 -to Mem_data[10]
+set_location_assignment PIN_V25 -to Mem_data[9]
+set_location_assignment PIN_V24 -to Mem_data[8]
+set_location_assignment PIN_V23 -to Mem_data[7]
+set_location_assignment PIN_W26 -to Mem_data[6]
+set_location_assignment PIN_W25 -to Mem_data[5]
+set_location_assignment PIN_W23 -to Mem_data[4]
+set_location_assignment PIN_W24 -to Mem_data[3]
+set_location_assignment PIN_U22 -to Mem_data[2]
+set_location_assignment PIN_Y25 -to Mem_data[1]
+set_location_assignment PIN_Y26 -to Mem_data[0]
+set_location_assignment PIN_AD25 -to Mem_OE
+set_location_assignment PIN_AC25 -to Mem_WE
 
 set_global_assignment -name SIMULATION_MODE FUNCTIONAL
 set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_simulation
 set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/src/output_files/smt.vwf"
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VERILOG_FILE sram/ram_ctrl.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_Controller.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_CCD_Config.v
 set_global_assignment -name VERILOG_FILE camera/wheel_sccb_checker.v
@@ -165,4 +219,4 @@ set_global_assignment -name VERILOG_FILE displays/vga_ctrl.v
 set_global_assignment -name VERILOG_FILE misc/quarter_clk.v
 set_global_assignment -name VERILOG_FILE capiano.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE output_files/smt.vwf
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"

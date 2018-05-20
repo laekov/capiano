@@ -9,6 +9,12 @@ module capiano(
 	output wire [2:0] vga_b,
 	output wire [55:0] led,
 
+	output wire Mem_CS,
+	output wire Mem_WE,
+	output wire Mem_OE,
+	output wire [19:0] Mem_addr,
+	inout [31:0] Mem_data,
+	
 	input [7:0] cam_data,
 	output wire scl,
 	inout sda,
