@@ -1,9 +1,11 @@
 // Camera control for OV7670 with FIFO
-`define CvsHeight 119
-`define CvsWidth 159
+`define CamHeight 239
+`define CamWidth 319
 module camera_ctrl(
+	input mem_clk,
 	input clk,
 	input [7:0] cam_data,
+	input work_en,
 	output wire rclk,
 	output wire fifo_wen,
 	output wire fifo_wrst,
@@ -12,23 +14,24 @@ module camera_ctrl(
 	input ov_vsync,
 	
 	input [31:0] addr,
-	output wire [8:0] q
+	output reg [8:0] q,
+	output reg [15:0] debug_out
 );
 
-	reg [8:0] cvs [0:`CvsHeight][0:`CvsWidth];
+	reg [15:0] cvs [0:32767];
 
-	// assign q = (addr[31:17] <= `CvsHeight && addr[15:1] <= `CvsWidth) ? cvs[addr[31:17]][addr[15:1]] : 9'b000000000;
 	reg [8:0] _q;
-	assign q = _q;
+	// assign q = _q;
 
 	reg _rrst;
 	reg _wrst;
+	reg _wen;
 
-	assign rclk = clk;
+	reg fifo_reading;
+
+	assign rclk = clk && fifo_reading;
 	assign fifo_oe = 1'b0;
-	assign fifo_wen = 1'b1;
-	assign fifo_rrst = _rrst;
-	assign fifo_wrst = _wrst;
+	assign fifo_wen = _wen;
 
 	reg [15:0] cur_x;
 	reg [15:0] cur_y;
@@ -41,29 +44,82 @@ module camera_ctrl(
 		cur_y = 16'h0000;
 		_rrst = 1'b1;
 		_wrst = 1'b1;
-		stat = 2'b00;
+		_wen = 1'b1;
+		stat = 2'b11;
+		fifo_reading = 1'b0;
 	end
 
-	always @(posedge rclk) begin
+	assign fifo_rrst = _rrst;
+	assign fifo_wrst = _wrst;
+
+	always @(posedge mem_clk) begin
+		q <= cvs[{ addr[24:18], addr[9:2] }][8:0];
+	end
+
+	always @(posedge clk) begin
 		if (stat == 2'b00) begin
-			// cvs[cur_y[15:2]][cur_x[15:2]] <= { data[14:12], data[9:7], data[4:2] };
-			_q <= { data[15:13], data[10:8], data[4:2] };
-			data[7:0] <= cam_data;
-			stat <= 2'b01;
-		end else if (stat == 2'b01) begin
-			data[15:8] <= cam_data;
-			if (cur_x == `CvsWidth) begin
+			cvs[{ cur_y[7:1], cur_x[8:1] }] <= { 7'b0, data[15:13], data[10:7], data[4:2] };
+		end
+	end
+
+	reg [15:0] cnt_sync;
+	reg sync_done;
+	initial begin
+		cnt_sync = 16'h0000;
+		sync_done = 1'b0;
+	end
+
+	always @(posedge ov_vsync) begin
+		if (stat == 2'b11) begin
+			sync_done <= 1'b1;
+			_wen <= 1'b1;
+			//_wrst <= 1'b1;
+		end else begin
+			sync_done <= 1'b0;
+			_wen <= 1'b0;
+			//_wrst <= 1'b0;
+		end
+	end
+	
+	always @(posedge clk) begin
+		case (stat)
+			2'b10: begin // init stat
+				fifo_reading <= 1'b1;
+				stat <= 2'b00;
 				cur_x <= 16'h0000;
-			end else begin
-				cur_x <= cur_x + 16'h0001;
-				if (cur_y == `CvsHeight) begin
-					cur_y <= 16'h0000;
+				cur_y <= 16'h0000;
+				_rrst <= 1'b1;
+			end 
+			2'b11: begin
+				if (sync_done && work_en) begin
+					stat <= 2'b10;
+					_rrst <= 1'b0;
 				end else begin
-					cur_y <= cur_y + 16'h0001;
+					stat <= 2'b11;
+				end
+			end 
+			2'b01: begin
+				data[15:8] <= cam_data;
+				if (cur_x >= `CamWidth) begin
+					cur_x <= 16'h0000;
+					if (cur_y >= `CamHeight) begin
+						fifo_reading <= 1'b0;
+						stat <= 2'b11;
+					end else begin
+						cur_y <= cur_y + 16'h0001;
+						stat <= 2'b00;
+					end
+				end else begin
+					cur_x <= cur_x + 16'h0001;
+					cur_y <= cur_y;
+					stat <= 2'b00;
 				end
 			end
-			stat <= 2'b00;
-		end
+			2'b00: begin
+				data[7:0] <= cam_data;
+				stat <= 2'b01;
+			end
+		endcase
 	end
 endmodule
 

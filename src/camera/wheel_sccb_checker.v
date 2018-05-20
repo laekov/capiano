@@ -8,7 +8,7 @@ module wheel_sccb_checker(
 	output wire work_done
 );
 	wire _fin;
-	assign debug_out = { 15'b0, _fin };
+	assign debug_out = { 15'b0, _fin, 8'b0};
 	assign work_done = _fin;
 
 	I2C_CCD_Config i2cc(
