@@ -66,7 +66,8 @@ module capiano(
 	wire cam0_en;
 	camera_ctrl __cam0(
 		.mem_clk(qu_clk),
-		.clk(d8_clk),
+		.clk(qu_clk),
+		.rst(rst),
 		.cam_data(cam_data),
 		.work_en(cam0_en),
 		.rclk(rclk),

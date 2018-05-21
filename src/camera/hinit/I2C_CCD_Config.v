@@ -30,7 +30,7 @@ module I2C_CCD_Config (	//	Host Side
 	parameter	CLK_Freq	=	100000000;	//	100	MHz
 	parameter	I2C_Freq	=	20000;		//	200	KHz
 	//	LUT Data Number
-	parameter	LUT_SIZE	=	163;
+	parameter	LUT_SIZE	=	164;
 	
 	/////////////////////	I2C Control Clock	////////////////////////
 	always@(posedge iCLK or negedge iRST_N)
@@ -113,7 +113,7 @@ module I2C_CCD_Config (	//	Host Side
 	   begin
 		   case(LUT_INDEX)
 			   0: LUT_DATA <= 16'h3a04;
-			   1: LUT_DATA <= 16'h40d0;
+			   1: LUT_DATA <= 16'h4030;
 			   2: LUT_DATA <= 16'h1214;
 			   3: LUT_DATA <= 16'h3280;
 			   4: LUT_DATA <= 16'h1716;
