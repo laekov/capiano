@@ -12,12 +12,12 @@ module capiano(
 	input [7:0] cam_data,
 	output wire scl,
 	inout sda,
-	output wire rclk,
-	output wire fifo_wen,
-	output wire fifo_wrst,
-	output wire fifo_rrst,
-	output wire fifo_oe,
-	input ov_vsync
+	input ov_vs,
+	input ov_hs,
+	input ov_pclk,
+	output wire ov_mclk,
+	output wire ov_rst,
+	input ov_pwdn
 );
 	wire [3:0] debug_out0;
 	wire [3:0] debug_out1;
@@ -41,11 +41,13 @@ module capiano(
 	wire hf_clk;
 	wire qu_clk;
 	wire d8_clk;
+	wire d16_clk;
 	quarter_clk __quarter_clk(
 		.raw_clk(clk),
 		.qu(qu_clk),
 		.half(hf_clk),
-		.d8(d8_clk)
+		.d8(d8_clk),
+		.d16(d16_clk)
 	);
 
 	wire [31:0] vga_addr;
@@ -64,17 +66,16 @@ module capiano(
 
 	wire [15:0] cam_out;
 	wire cam0_en;
+	assign ov_mclk = qu_clk;
 	camera_ctrl __cam0(
 		.mem_clk(qu_clk),
-		.clk(qu_clk),
-		.rst(rst),
+		.clk(d16_clk),
 		.cam_data(cam_data),
-		.work_en(cam0_en),
-		.rclk(rclk),
-		.fifo_wen(fifo_wen),
-		.fifo_rrst(fifo_rrst),
-		.fifo_oe(fifo_oe),
-		.ov_vsync(ov_vsync),
+		.ov_vs(ov_vs),
+		.ov_hs(ov_hs),
+		.ov_pclk(ov_pclk),
+		.ov_rst(ov_rst),
+		.ov_pwdn(ov_pwdn),
 		.addr(vga_addr),
 		.q(vga_data),
 		.debug_out(cam_out)
@@ -95,7 +96,7 @@ module capiano(
 	assign debug_out1 = cam_out[7:4];
 	assign debug_out2 = cam_out[11:8];
 	assign debug_out3 = cam_out[15:12];
-	assign debug_out4 = { 3'b000, ov_vsync };
+	assign debug_out4 = { 3'b000, ov_vs };
 	assign debug_out5 = 4'hb;
 	assign debug_out6 = { 3'b0, cam0_en };
 	assign debug_out7 = 4'hb;
