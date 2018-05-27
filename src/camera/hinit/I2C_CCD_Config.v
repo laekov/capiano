@@ -27,7 +27,7 @@ module I2C_CCD_Config (	//	Host Side
 	reg	[3:0]	mSetup_ST;
 	
 	//	Clock Setting
-	parameter	CLK_Freq	=	100000000;	//	100	MHz
+	parameter	CLK_Freq	=	12500000;	//	100	MHz
 	parameter	I2C_Freq	=	20000;		//	200	KHz
 	//	LUT Data Number
 	parameter	LUT_SIZE	=	164;
@@ -124,7 +124,8 @@ module I2C_CCD_Config (	//	Host Side
 			   9: LUT_DATA <= 16'h0c04;
 			   10: LUT_DATA <= 16'h3e00;
 			   11: LUT_DATA <= 16'h703a;
-			   12: LUT_DATA <= 16'h7135;
+			   // 12: LUT_DATA <= 16'h7135;
+			   12: LUT_DATA <= 16'h7180;
 			   13: LUT_DATA <= 16'h7211;
 			   14: LUT_DATA <= 16'h7300;
 			   15: LUT_DATA <= 16'ha202;

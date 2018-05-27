@@ -91,11 +91,11 @@ module camera_ctrl(
 		if (!rst) begin
 			stat <= 2'b11;
 			f_cnt <= 16'h0000;
-			_rrst <= 1'b0;
+			_rrst <= 1'b1;
 		end else begin
 			case (stat)
 				2'b10: begin // init stat
-					if (clk_cnt >= 16'h8000) begin
+					if (clk_cnt >= 16'd54000) begin
 						fifo_reading <= 1'b1;
 						stat <= 2'b00;
 						cur_x <= 16'h0000;

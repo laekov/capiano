@@ -41,11 +41,13 @@ module capiano(
 	wire hf_clk;
 	wire qu_clk;
 	wire d8_clk;
+	wire d16_clk;
 	quarter_clk __quarter_clk(
 		.raw_clk(clk),
 		.qu(qu_clk),
 		.half(hf_clk),
-		.d8(d8_clk)
+		.d8(d8_clk),
+		.d16(d16_clk)
 	);
 
 	wire [31:0] vga_addr;
@@ -65,8 +67,8 @@ module capiano(
 	wire [15:0] cam_out;
 	wire cam0_en;
 	camera_ctrl __cam0(
-		.mem_clk(d8_clk),
-		.clk(qu_clk),
+		.mem_clk(qu_clk),
+		.clk(d16_clk),
 		.rst(rst),
 		.cam_data(cam_data),
 		.work_en(cam0_en),
