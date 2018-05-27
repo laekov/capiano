@@ -25,7 +25,6 @@ module camera_ctrl(
 	// assign q = _q;
 
 	reg _rrst;
-	reg _wrst;
 	reg _wen;
 
 	reg fifo_reading;
@@ -44,14 +43,13 @@ module camera_ctrl(
 		cur_x = 16'h0000;
 		cur_y = 16'h0000;
 		_rrst = 1'b1;
-		_wrst = 1'b1;
 		_wen = 1'b1;
 		stat = 2'b11;
 		fifo_reading = 1'b0;
 	end
 
 	assign fifo_rrst = _rrst;
-	assign fifo_wrst = !ov_vsync; 
+	assign fifo_wrst = !ov_vsync && rst;  
 
 	always @(posedge mem_clk) begin
 		q <= cvs[{ addr[24:18], addr[9:2] }][8:0];
@@ -59,10 +57,12 @@ module camera_ctrl(
 
 	always @(posedge clk) begin
 		if (stat == 2'b01) begin
+			cvs[{ cur_y[7:1], cur_x[8:1] }] <= { 7'b0, data[15:13], data[10:8], cam_data[4:2] };
+		end
+		if (stat == 2'b00) begin
 			if (cur_x == 16'h000a && cur_y == 16'h000a) begin
 				debug_out <= data;
 			end
-			cvs[{ cur_y[7:1], cur_x[8:1] }] <= { 7'b0, data[7:5], data[2:0], cam_data[4:2] };
 		end
 	end
 
@@ -106,15 +106,16 @@ module camera_ctrl(
 					end
 				end 
 				2'b11: begin
-					if (sync_done && work_en && f_cnt < 16'h001a) begin
+					if (sync_done && work_en && f_cnt < 16'h0002) begin
 						clk_cnt <= 16'h0000;
 						stat <= 2'b10;
-						// _rrst <= 1'b0;
+						_rrst <= 1'b1;
 					end else begin
 						stat <= 2'b11;
 					end
 				end 
 				2'b01: begin
+					data[7:0] <= cam_data;
 					if (cur_x >= `CamWidth) begin
 						cur_x <= 16'h0000;
 						if (cur_y >= `CamHeight) begin
@@ -132,7 +133,7 @@ module camera_ctrl(
 					end
 				end
 				2'b00: begin
-					data[7:0] <= cam_data;
+					data[15:8] <= cam_data;
 					stat <= 2'b01;
 				end
 			endcase
