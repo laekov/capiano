@@ -15,6 +15,9 @@ module capiano(
 	output wire [19:0] Mem_addr,
 	inout [31:0] Mem_data,
 	
+	input rx,
+	output wire tx,
+	
 	input [7:0] cam_data,
 	output wire scl,
 	inout sda,
@@ -127,6 +130,45 @@ module capiano(
 		.out_data(back_data),
 		.nowsta(ram_sta),
 		.nowcnt(ram_cnt)
+	);
+	
+	wire uart_send_done;
+	wire uart_read_done;
+	wire uart_ctrl_send_done;
+	wire uart_ctrl_send;
+	wire uart_send;
+	wire [7:0] uart_read_data;
+	wire [7:0] uart_send_data;
+	wire [319:0] ToPC;
+	uart_test __uart_test(
+	.clk(clk),
+	.rst(rst),
+	.send_done(uart_ctrl_send_done),
+	.send(uart_ctrl_send),
+	.data(ToPC)
+	);
+	uart_ctrl __uart_ctrl(
+		.clk(clk),
+		.rst(rst),
+	.uart_read_done(uart_read_done),
+	.uart_send_done(uart_send_done),
+	.uart_send(uart_send),
+	.read_data(uart_read_data),
+	.send_data(uart_send_data),
+	.send_done(uart_ctrl_send_done),
+	.send(uart_ctrl_send),
+	.data(ToPC)
+	);
+	uart __uart(
+		.clk(clk),
+		.rst(rst),
+	.send(uart_send),
+	.rx(rx),
+	.send_data(uart_send_data),
+	.read_data(uart_read_data),
+	.tx(tx),
+	.read_done(uart_read_done),
+	.send_done(uart_send_done)
 	);
 	
 	// debug output from right to left 0 to 7
