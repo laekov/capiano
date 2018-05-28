@@ -3,7 +3,8 @@ module uart_test(
 	input rst,
 	input send_done,
 	output wire send,
-	output wire [319:0] data
+	output wire [319:0] data,
+	output wire [3:0] sta
 );
 reg [319:0] Data;
 reg tosend;
@@ -11,6 +12,7 @@ reg [3:0] status;
 reg [3:0] nxt_sta;
 assign send=tosend;
 assign data=Data;
+assign sta=status;
 always @(posedge clk or negedge rst)begin
 	if(!rst)status<=0;
 	else status<=nxt_sta;
