@@ -27,6 +27,13 @@ assign send_done=sendDone;
 assign send_sta=send_status;
 assign tx=TX;
 assign subclk=cnt[3:0];
+initial begin
+	TX<=1'b1;
+	send_status<=0;
+	read_status<=0;
+	readDone<=1'b0;
+	sendDone<=1'b0;
+end
 always @(posedge clk or negedge rst)begin
 	if(!rst)begin
 		cnt<=20'b0;
@@ -96,7 +103,6 @@ always @(send_status)begin
 		0:begin
 			sendDone<=1'b0;
 			if(send==1'b1)begin
-				
 				nxt_send_sta<=1;
 				TX<=1'b0;
 				sendData<=send_data;
