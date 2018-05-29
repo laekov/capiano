@@ -124,8 +124,9 @@ module I2C_CCD_Config (	//	Host Side
 			   9: LUT_DATA <= 16'h0c04;
 			   10: LUT_DATA <= 16'h3e00;
 			   11: LUT_DATA <= 16'h703a;
-			   // 12: LUT_DATA <= 16'h7135;
-			   12: LUT_DATA <= 16'h7180;
+			   // 11: LUT_DATA <= 16'h7080;
+			   12: LUT_DATA <= 16'h7135;
+			   // 12: LUT_DATA <= 16'h7100;
 			   13: LUT_DATA <= 16'h7211;
 			   14: LUT_DATA <= 16'h7300;
 			   15: LUT_DATA <= 16'ha202;

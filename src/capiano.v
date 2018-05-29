@@ -64,11 +64,11 @@ module capiano(
 		.q(vga_data)
 	);
 
-	wire [15:0] cam_out;
+	wire [31:0] cam_out;
 	wire cam0_en;
 	camera_ctrl __cam0(
 		.mem_clk(qu_clk),
-		.clk(d16_clk),
+		.clk(d8_clk),
 		.rst(rst),
 		.cam_data(cam_data),
 		.work_en(cam0_en),
@@ -82,9 +82,9 @@ module capiano(
 		.debug_out(cam_out)
 	);
 
-	wire [23:0] sccb_out;
-	wheel_sccb_checker __sccb0(
-		.clk(qu_clk),
+	wire [31:0] sccb_out;
+	sccb_checker __sccb0(
+		.clk(man_clk),
 		.rst(rst),
 		.scl(scl),
 		.sda(sda),
@@ -93,12 +93,14 @@ module capiano(
 	);
 
 	// debug output from right to left 0 to 7
-	assign debug_out0 = cam_out[3:0];
-	assign debug_out1 = cam_out[7:4];
-	assign debug_out2 = cam_out[11:8];
-	assign debug_out3 = cam_out[15:12];
-	assign debug_out4 = { 3'b000, ov_vsync };
-	assign debug_out5 = 4'hb;
-	assign debug_out6 = { 3'b0, cam0_en };
-	assign debug_out7 = 4'hb;
+	wire [31:0] _out;
+	assign _out = sccb_out;
+	assign debug_out0 = _out[3:0];
+	assign debug_out1 = _out[7:4];
+	assign debug_out2 = _out[11:8];
+	assign debug_out3 = _out[15:12];
+	assign debug_out4 = _out[19:16];
+	assign debug_out5 = _out[23:20];
+	assign debug_out6 = _out[27:24];
+	assign debug_out7 = _out[31:28];
 endmodule

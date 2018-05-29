@@ -16,7 +16,7 @@ module camera_ctrl(
 	
 	input [31:0] addr,
 	output reg [8:0] q,
-	output reg [15:0] debug_out
+	output reg [31:0] debug_out
 );
 
 	reg [15:0] cvs [0:32767];
@@ -29,7 +29,7 @@ module camera_ctrl(
 
 	reg fifo_reading;
 
-	assign rclk = clk && fifo_reading;
+	assign rclk = clk;
 	assign fifo_oe = 1'b0;
 	assign fifo_wen = _wen;
 
@@ -59,11 +59,6 @@ module camera_ctrl(
 		if (stat == 2'b01) begin
 			cvs[{ cur_y[7:1], cur_x[8:1] }] <= { 7'b0, data[15:13], data[10:8], cam_data[4:2] };
 		end
-		if (stat == 2'b00) begin
-			if (cur_x == 16'h000a && cur_y == 16'h000a) begin
-				debug_out <= data;
-			end
-		end
 	end
 
 	reg [15:0] cnt_sync;
@@ -75,14 +70,33 @@ module camera_ctrl(
 		f_cnt = 16'h0000;
 	end
 
-	always @(posedge ov_vsync) begin
-		if (stat == 2'b11) begin
+	reg [7:0] frame_cnt;
+	initial begin
+		frame_cnt = 8'b0;
+	end
+
+	always @(posedge ov_vsync or negedge rst) begin
+		if (!rst) begin
+			_wen <= 1'b0;
+			frame_cnt <= 8'h00;
+		end else if (stat == 2'b11 && frame_cnt == 8'b0) begin
 			sync_done <= 1'b1;
 			_wen <= 1'b1;
+			frame_cnt <= 8'h01;
 		end else begin
-			sync_done <= 1'b0;
+			if (frame_cnt < 8'hff) begin
+				frame_cnt <= frame_cnt + 8'h01;
+			end
+			sync_done <= 1'b1;
 			_wen <= 1'b0;
 		end
+	end
+
+	always @(posedge mem_clk) begin
+		debug_out[31:24] <= frame_cnt;
+		debug_out[23:16] <= f_cnt[7:0];
+		debug_out[15:8] <= data[15:8];
+		debug_out[7:0] <= cam_data;
 	end
 	
 	reg [15:0] clk_cnt;
@@ -98,23 +112,31 @@ module camera_ctrl(
 					if (clk_cnt >= 16'd54000) begin
 						fifo_reading <= 1'b1;
 						stat <= 2'b00;
+						clk_cnt <= clk_cnt;
 						cur_x <= 16'h0000;
 						cur_y <= 16'h0000;
 						_rrst <= 1'b1;
 					end else begin
+						fifo_reading <= 1'b0;
+						stat <= 2'b00;
 						clk_cnt <= clk_cnt + 16'h0001;
+						cur_x <= 16'h0000;
+						cur_y <= 16'h0000;
+						_rrst <= 1'b0;
 					end
 				end 
 				2'b11: begin
-					if (sync_done && work_en && f_cnt < 16'h0002) begin
+					fifo_reading <= 1'b0;
+					if (sync_done && work_en && f_cnt < 16'h0001) begin
 						clk_cnt <= 16'h0000;
 						stat <= 2'b10;
-						_rrst <= 1'b1;
+						_rrst <= 1'b0;
 					end else begin
 						stat <= 2'b11;
 					end
 				end 
 				2'b01: begin
+					_rrst <= 1'b1;
 					data[7:0] <= cam_data;
 					if (cur_x >= `CamWidth) begin
 						cur_x <= 16'h0000;
@@ -123,17 +145,23 @@ module camera_ctrl(
 							stat <= 2'b11;
 							f_cnt <= f_cnt + 16'h1;
 						end else begin
+							fifo_reading <= 1'b1;
 							cur_y <= cur_y + 16'h0001;
 							stat <= 2'b00;
 						end
 					end else begin
+						fifo_reading <= 1'b1;
 						cur_x <= cur_x + 16'h0001;
 						cur_y <= cur_y;
 						stat <= 2'b00;
 					end
 				end
 				2'b00: begin
+					fifo_reading <= 1'b1;
+					_rrst <= 1'b1;
 					data[15:8] <= cam_data;
+					cur_x <= cur_x;
+					cur_y <= cur_y;
 					stat <= 2'b01;
 				end
 			endcase
