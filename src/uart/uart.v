@@ -101,8 +101,8 @@ end
 always @(send_status)begin
 	case(send_status)
 		0:begin
-			sendDone<=1'b0;
 			if(send==1'b1)begin
+				sendDone<=1'b0;
 				nxt_send_sta<=1;
 				TX<=1'b0;
 				sendData<=send_data;

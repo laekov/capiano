@@ -164,6 +164,7 @@ module capiano(
 	.send(uart_ctrl_send),
 	.data(ToPC),
 	.sta(uart_ctrl_sta),
+	.uart_send_sta(uart_send_sta)
 	);
 	uart __uart(
 		.clk(clk),

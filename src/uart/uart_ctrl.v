@@ -9,7 +9,8 @@ module uart_ctrl(
 	output wire send_done,
 	input send,
 	input [319:0] data,
-	output wire [7:0] sta
+	output wire [7:0] sta,
+	input [3:0] uart_send_sta
 );
 reg tosend;
 reg sendDone;
@@ -22,7 +23,7 @@ assign send_data=sendData;
 assign sta=send_status;
 always @(posedge clk or negedge rst)begin
 	if(!rst)send_status<=0;
-	else begin
+	else begin	
 		send_status<=nxt_send_sta;
 	end
 end
@@ -45,8 +46,14 @@ always @(send_status)begin
 			end
 		end
 1:begin
-  nxt_send_sta<=2;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=1;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=2;
+    tosend<=1'b1;
+  end
   sendData=data[7:0];
 end
 2:begin
@@ -60,8 +67,14 @@ end
   end
 end
 3:begin
-  nxt_send_sta<=4;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=3;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=4;
+    tosend<=1'b1;
+  end
   sendData=data[15:8];
 end
 4:begin
@@ -75,8 +88,14 @@ end
   end
 end
 5:begin
-  nxt_send_sta<=6;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=5;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=6;
+    tosend<=1'b1;
+  end
   sendData=data[23:16];
 end
 6:begin
@@ -90,8 +109,14 @@ end
   end
 end
 7:begin
-  nxt_send_sta<=8;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=7;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=8;
+    tosend<=1'b1;
+  end
   sendData=data[31:24];
 end
 8:begin
@@ -105,8 +130,14 @@ end
   end
 end
 9:begin
-  nxt_send_sta<=10;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=9;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=10;
+    tosend<=1'b1;
+  end
   sendData=data[39:32];
 end
 10:begin
@@ -120,8 +151,14 @@ end
   end
 end
 11:begin
-  nxt_send_sta<=12;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=11;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=12;
+    tosend<=1'b1;
+  end
   sendData=data[47:40];
 end
 12:begin
@@ -135,8 +172,14 @@ end
   end
 end
 13:begin
-  nxt_send_sta<=14;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=13;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=14;
+    tosend<=1'b1;
+  end
   sendData=data[55:48];
 end
 14:begin
@@ -150,8 +193,14 @@ end
   end
 end
 15:begin
-  nxt_send_sta<=16;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=15;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=16;
+    tosend<=1'b1;
+  end
   sendData=data[63:56];
 end
 16:begin
@@ -165,8 +214,14 @@ end
   end
 end
 17:begin
-  nxt_send_sta<=18;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=17;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=18;
+    tosend<=1'b1;
+  end
   sendData=data[71:64];
 end
 18:begin
@@ -180,8 +235,14 @@ end
   end
 end
 19:begin
-  nxt_send_sta<=20;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=19;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=20;
+    tosend<=1'b1;
+  end
   sendData=data[79:72];
 end
 20:begin
@@ -195,8 +256,14 @@ end
   end
 end
 21:begin
-  nxt_send_sta<=22;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=21;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=22;
+    tosend<=1'b1;
+  end
   sendData=data[87:80];
 end
 22:begin
@@ -210,8 +277,14 @@ end
   end
 end
 23:begin
-  nxt_send_sta<=24;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=23;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=24;
+    tosend<=1'b1;
+  end
   sendData=data[95:88];
 end
 24:begin
@@ -225,8 +298,14 @@ end
   end
 end
 25:begin
-  nxt_send_sta<=26;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=25;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=26;
+    tosend<=1'b1;
+  end
   sendData=data[103:96];
 end
 26:begin
@@ -240,8 +319,14 @@ end
   end
 end
 27:begin
-  nxt_send_sta<=28;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=27;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=28;
+    tosend<=1'b1;
+  end
   sendData=data[111:104];
 end
 28:begin
@@ -255,8 +340,14 @@ end
   end
 end
 29:begin
-  nxt_send_sta<=30;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=29;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=30;
+    tosend<=1'b1;
+  end
   sendData=data[119:112];
 end
 30:begin
@@ -270,8 +361,14 @@ end
   end
 end
 31:begin
-  nxt_send_sta<=32;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=31;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=32;
+    tosend<=1'b1;
+  end
   sendData=data[127:120];
 end
 32:begin
@@ -285,8 +382,14 @@ end
   end
 end
 33:begin
-  nxt_send_sta<=34;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=33;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=34;
+    tosend<=1'b1;
+  end
   sendData=data[135:128];
 end
 34:begin
@@ -300,8 +403,14 @@ end
   end
 end
 35:begin
-  nxt_send_sta<=36;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=35;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=36;
+    tosend<=1'b1;
+  end
   sendData=data[143:136];
 end
 36:begin
@@ -315,8 +424,14 @@ end
   end
 end
 37:begin
-  nxt_send_sta<=38;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=37;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=38;
+    tosend<=1'b1;
+  end
   sendData=data[151:144];
 end
 38:begin
@@ -330,8 +445,14 @@ end
   end
 end
 39:begin
-  nxt_send_sta<=40;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=39;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=40;
+    tosend<=1'b1;
+  end
   sendData=data[159:152];
 end
 40:begin
@@ -345,8 +466,14 @@ end
   end
 end
 41:begin
-  nxt_send_sta<=42;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=41;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=42;
+    tosend<=1'b1;
+  end
   sendData=data[167:160];
 end
 42:begin
@@ -360,8 +487,14 @@ end
   end
 end
 43:begin
-  nxt_send_sta<=44;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=43;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=44;
+    tosend<=1'b1;
+  end
   sendData=data[175:168];
 end
 44:begin
@@ -375,8 +508,14 @@ end
   end
 end
 45:begin
-  nxt_send_sta<=46;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=45;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=46;
+    tosend<=1'b1;
+  end
   sendData=data[183:176];
 end
 46:begin
@@ -390,8 +529,14 @@ end
   end
 end
 47:begin
-  nxt_send_sta<=48;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=47;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=48;
+    tosend<=1'b1;
+  end
   sendData=data[191:184];
 end
 48:begin
@@ -405,8 +550,14 @@ end
   end
 end
 49:begin
-  nxt_send_sta<=50;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=49;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=50;
+    tosend<=1'b1;
+  end
   sendData=data[199:192];
 end
 50:begin
@@ -420,8 +571,14 @@ end
   end
 end
 51:begin
-  nxt_send_sta<=52;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=51;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=52;
+    tosend<=1'b1;
+  end
   sendData=data[207:200];
 end
 52:begin
@@ -435,8 +592,14 @@ end
   end
 end
 53:begin
-  nxt_send_sta<=54;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=53;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=54;
+    tosend<=1'b1;
+  end
   sendData=data[215:208];
 end
 54:begin
@@ -450,8 +613,14 @@ end
   end
 end
 55:begin
-  nxt_send_sta<=56;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=55;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=56;
+    tosend<=1'b1;
+  end
   sendData=data[223:216];
 end
 56:begin
@@ -465,8 +634,14 @@ end
   end
 end
 57:begin
-  nxt_send_sta<=58;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=57;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=58;
+    tosend<=1'b1;
+  end
   sendData=data[231:224];
 end
 58:begin
@@ -480,8 +655,14 @@ end
   end
 end
 59:begin
-  nxt_send_sta<=60;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=59;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=60;
+    tosend<=1'b1;
+  end
   sendData=data[239:232];
 end
 60:begin
@@ -495,8 +676,14 @@ end
   end
 end
 61:begin
-  nxt_send_sta<=62;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=61;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=62;
+    tosend<=1'b1;
+  end
   sendData=data[247:240];
 end
 62:begin
@@ -510,8 +697,14 @@ end
   end
 end
 63:begin
-  nxt_send_sta<=64;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=63;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=64;
+    tosend<=1'b1;
+  end
   sendData=data[255:248];
 end
 64:begin
@@ -525,8 +718,14 @@ end
   end
 end
 65:begin
-  nxt_send_sta<=66;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=65;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=66;
+    tosend<=1'b1;
+  end
   sendData=data[263:256];
 end
 66:begin
@@ -540,8 +739,14 @@ end
   end
 end
 67:begin
-  nxt_send_sta<=68;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=67;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=68;
+    tosend<=1'b1;
+  end
   sendData=data[271:264];
 end
 68:begin
@@ -555,8 +760,14 @@ end
   end
 end
 69:begin
-  nxt_send_sta<=70;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=69;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=70;
+    tosend<=1'b1;
+  end
   sendData=data[279:272];
 end
 70:begin
@@ -570,8 +781,14 @@ end
   end
 end
 71:begin
-  nxt_send_sta<=72;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=71;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=72;
+    tosend<=1'b1;
+  end
   sendData=data[287:280];
 end
 72:begin
@@ -585,8 +802,14 @@ end
   end
 end
 73:begin
-  nxt_send_sta<=74;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=73;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=74;
+    tosend<=1'b1;
+  end
   sendData=data[295:288];
 end
 74:begin
@@ -600,8 +823,14 @@ end
   end
 end
 75:begin
-  nxt_send_sta<=76;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=75;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=76;
+    tosend<=1'b1;
+  end
   sendData=data[303:296];
 end
 76:begin
@@ -615,8 +844,14 @@ end
   end
 end
 77:begin
-  nxt_send_sta<=78;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=77;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=78;
+    tosend<=1'b1;
+  end
   sendData=data[311:304];
 end
 78:begin
@@ -630,8 +865,14 @@ end
   end
 end
 79:begin
-  nxt_send_sta<=80;
-  tosend<=1'b1;
+  if(uart_send_sta==9)begin
+    nxt_send_sta<=79;
+    tosend<=1'b0;
+  end
+  else begin
+    nxt_send_sta<=80;
+    tosend<=1'b1;
+  end
   sendData=data[319:312];
 end
 80:begin
