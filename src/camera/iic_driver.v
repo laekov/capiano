@@ -1,4 +1,4 @@
-`define TOTALSTAT 33
+`define TOTALSTAT 13
 module iic_driver(
 	input clk,
 	input rst,
@@ -67,8 +67,12 @@ module iic_driver(
 		if (stat == 8'hff) begin
 			next_stat <= 8'hff;
 		end else if (_wr || _rd) begin
-			if (stat < `TOTALSTAT) begin
-				next_stat <= stat + 8'h1;
+			if (stat < `TOTALSTAT || !_done) begin
+				if (stat == 8'd20 && _rd) begin
+					next_stat <= 8'h4d;
+				end else begin
+					next_stat <= stat + 8'h1;
+				end
 			end else begin
 				next_stat <= 8'h0;
 			end
@@ -83,6 +87,9 @@ module iic_driver(
 			_wr <= 1'b0;
 			acks <= 3'b0;
 			_done <= 1'b0;
+			not_working <= 1'b1;
+			sda_writing <= 1'b1;
+			_sda <= 1'b1;
 		end else begin
 			case (stat)
 				8'd0: begin 
@@ -96,15 +103,15 @@ module iic_driver(
 					sda_writing <= 1'b1;
 				end
 				8'd1: begin acks <= 3'b0; _done <= 1'b0; sda_writing <= 1'b1; end
-				8'd2: begin not_working <= 1'b0; end
-				8'd3: begin _sda <= _flag[7]; end
-				8'd4: begin _sda <= _flag[6]; end
-				8'd5: begin _sda <= _flag[5]; end
-				8'd6: begin _sda <= _flag[4]; end
-				8'd7: begin _sda <= _flag[3]; end
-				8'd8: begin _sda <= _flag[2]; end
-				8'd9: begin _sda <= _flag[1]; end
-				8'd10: begin _sda <= _flag[0]; end
+				8'd2: begin not_working <= 1'b1; end
+				8'd3: begin _sda <= wr_flag[7]; not_working <= 1'b0; end
+				8'd4: begin _sda <= wr_flag[6]; end
+				8'd5: begin _sda <= wr_flag[5]; end
+				8'd6: begin _sda <= wr_flag[4]; end
+				8'd7: begin _sda <= wr_flag[3]; end
+				8'd8: begin _sda <= wr_flag[2]; end
+				8'd9: begin _sda <= wr_flag[1]; end
+				8'd10: begin _sda <= wr_flag[0]; end
 				8'd11: begin sda_writing <= 1'b0; end
 				8'd12: begin acks[0] <= sda; sda_writing <= 1'b1; _sda <= addr[7]; end
 				8'd13: begin _sda <= addr[6]; end
@@ -115,66 +122,42 @@ module iic_driver(
 				8'd18: begin _sda <= addr[1]; end
 				8'd19: begin _sda <= addr[0]; end
 				8'd20: begin sda_writing <= 1'b0; end
-				8'd21: begin acks[1] <= sda; sda_writing <= _wr;  
-					if (_rd) begin
-						_data[7] <= sda;
-					end else begin
-						_sda <= wr_data[7];
-					end
-				end
-				8'd22: begin 
-					if (_rd) begin
-						_data[6] <= sda;
-					end else begin
-						_sda <= wr_data[6];
-					end
-				end
-				8'd23: begin 
-					if (_rd) begin
-						_data[5] <= sda;
-					end else begin
-						_sda <= wr_data[5];
-					end
-				end
-				8'd24: begin 
-					if (_rd) begin
-						_data[4] <= sda;
-					end else begin
-						_sda <= wr_data[4];
-					end
-				end
-				8'd25: begin 
-					if (_rd) begin
-						_data[3] <= sda;
-					end else begin
-						_sda <= wr_data[3];
-					end
-				end
-				8'd26: begin 
-					if (_rd) begin
-						_data[2] <= sda;
-					end else begin
-						_sda <= wr_data[2];
-					end
-				end
-				8'd27: begin 
-					if (_rd) begin
-						_data[1] <= sda;
-					end else begin
-						_sda <= wr_data[1];
-					end
-				end
-				8'd28: begin 
-					if (_rd) begin
-						_data[0] <= sda;
-					end else begin
-						_sda <= wr_data[0];
-					end
-				end
+				8'd21: begin acks[1] <= sda; sda_writing <= _wr;  _sda <= wr_data[7]; end
+				8'd22: begin _sda <= wr_data[6]; end
+				8'd23: begin _sda <= wr_data[5]; end
+				8'd24: begin _sda <= wr_data[4]; end
+				8'd25: begin _sda <= wr_data[3]; end
+				8'd26: begin _sda <= wr_data[2]; end
+				8'd27: begin _sda <= wr_data[1]; end
+				8'd28: begin _sda <= wr_data[0]; end
 				8'd29: begin sda_writing <= 1'b0; end
 				8'd30: begin acks[2] <= sda; sda_writing <= 1'b1; _sda <= 1'b0; end
 				8'd31: begin not_working <= 1'b1; end
 				8'd32: begin _sda <= 1'b1; _rd <= 1'b0; _wr <= 1'b0; _done <= 1'b1; end
+				8'h4d: begin sda_writing <= 1'b1; _sda <= 1'b1; not_working <= 1'b1; acks[1] <= sda; end
+				8'h4e: begin _sda <= 1'b0; end
+				8'h4f: begin _sda <= 1'b1; not_working <= 1'b1; end
+				8'h50: begin _sda <= rd_flag[7]; not_working <= 1'b0; end
+				8'h51: begin _sda <= rd_flag[6]; end
+				8'h52: begin _sda <= rd_flag[5]; end
+				8'h53: begin _sda <= rd_flag[4]; end
+				8'h54: begin _sda <= rd_flag[3]; end
+				8'h55: begin _sda <= rd_flag[2]; end
+				8'h56: begin _sda <= rd_flag[1]; end
+				8'h57: begin _sda <= rd_flag[0]; end
+				8'h58: begin sda_writing <= 1'b0; end
+				8'h59: begin acks[2] <= sda; sda_writing <= 1'b0; end
+				8'h5a: begin _data[7] <= sda; end
+				8'h5b: begin _data[6] <= sda; end
+				8'h5c: begin _data[5] <= sda; end
+				8'h5d: begin _data[4] <= sda; end
+				8'h5e: begin _data[3] <= sda; end
+				8'h5f: begin _data[2] <= sda; end
+				8'h60: begin _data[1] <= sda; end
+				8'h61: begin _data[0] <= sda; sda_writing <= 1'b1; _sda <= 1'b1; end
+				8'h62: begin not_working <= 1'b1; _sda <= 1'b0; end
+				8'h63: begin _sda <= 1'b1; end
+				8'h64: begin _rd <= 1'b0; _wr <= 1'b0; _done <= 1'b1; end
 			endcase
 		end
 	end

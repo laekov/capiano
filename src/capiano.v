@@ -38,17 +38,19 @@ module capiano(
 	dig_ctrl __dig_6( .dig(debug_out6), .light(led[48:42]) );
 	dig_ctrl __dig_7( .dig(debug_out7), .light(led[55:49]) );
 
+	wire [31:0] clks;
 	wire hf_clk;
 	wire qu_clk;
 	wire d8_clk;
 	wire d16_clk;
 	quarter_clk __quarter_clk(
 		.raw_clk(clk),
-		.qu(qu_clk),
-		.half(hf_clk),
-		.d8(d8_clk),
-		.d16(d16_clk)
+		.out_clk(clks)
 	);
+	assign hf_clk = clks[0];
+	assign qu_clk = clks[1];
+	assign d8_clk = clks[2];
+	assign d16_clk = clks[3];
 
 	wire [31:0] vga_addr;
 	wire [8:0] vga_data;
@@ -84,6 +86,7 @@ module capiano(
 
 	wire [31:0] sccb_out;
 	sccb_checker __sccb0(
+		// .clk(clks[23]),
 		.clk(man_clk),
 		.rst(rst),
 		.scl(scl),
