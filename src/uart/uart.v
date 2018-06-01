@@ -1,11 +1,12 @@
 module uart(
+	input fclk,
 	input clk,
 	input rst,
 	input send,
 	input rx,
 	input [7:0] send_data,
 	output wire [7:0] read_data,
-	output wire tx,
+	output wire tx,	
 	output wire read_done,
 	output wire send_done,
 	output wire [3:0] send_sta,
@@ -34,23 +35,36 @@ initial begin
 	readDone<=1'b0;
 	sendDone<=1'b0;
 end
-always @(posedge clk or negedge rst)begin
+always @(posedge fclk or negedge rst)begin
 	if(!rst)begin
-		cnt<=20'b0;
 		read_status<=0;
 		send_status<=0;
 	end
 	else begin
-		if(cnt>=10417)begin
-			cnt<=20'b0;
+		if(clk==1'b1)begin
 			read_status<=nxt_read_sta;
 			send_status<=nxt_send_sta;
 		end
-		else begin
-			cnt<=cnt+1;
-		end
 	end
 end
+//always @(posedge clk or negedge rst)begin
+//	if(!rst)begin
+//		cnt<=20'b0;
+//		read_status<=0;
+//		send_status<=0;
+//	end
+//	else begin
+//		if(cnt>=10417)begin
+//			cnt<=20'b0;
+//			read_status<=nxt_read_sta;
+//			send_status<=nxt_send_sta;
+//		end
+//		else begin
+//			cnt<=cnt+1;
+//		end
+//	end
+//end
+
 always @(read_status)begin
 	case(read_status)
 		0:begin

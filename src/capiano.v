@@ -1,3 +1,7 @@
+//`define SendToPC 319
+//`define SendToPCSize 320
+`define SendToPC 31
+`define SendToPCSize 32
 module capiano(
 	input man_clk,
 	input clk,
@@ -137,23 +141,31 @@ module capiano(
 	wire uart_ctrl_send_done;
 	wire uart_ctrl_send;
 	wire uart_send;
-	wire uart_clk;
+	wire u_clk;
 	wire [7:0] uart_read_data;
 	wire [7:0] uart_send_data;
-	wire [319:0] ToPC;
+	wire [`SendToPC:0] ToPC;
 	wire [3:0] uart_test_sta;
 	wire [3:0] uart_send_sta;
+	wire [3:0] uart_test_nxtsta;
 	wire [7:0] uart_ctrl_sta;
-	uart_test __uart_test(
+	wire [3:0] uart_ctrl_nxtsta;
+	uart_clk __uart_clk(
 	.clk(clk),
+	.rst(rst),
+	._uart_clk(u_clk)
+	);
+	uart_test __uart_test(
+	.clk(qu_clk),
 	.rst(rst),
 	.send_done(uart_ctrl_send_done),
 	.send(uart_ctrl_send),
 	.data(ToPC),
-	.sta(uart_test_sta)
+	.sta(uart_test_sta),
+	.nxtsta(uart_test_nxtsta)
 	);
 	uart_ctrl __uart_ctrl(
-		.clk(clk),
+		.clk(qu_clk),
 		.rst(rst),
 	.uart_read_done(uart_read_done),
 	.uart_send_done(uart_send_done),
@@ -164,10 +176,12 @@ module capiano(
 	.send(uart_ctrl_send),
 	.data(ToPC),
 	.sta(uart_ctrl_sta),
-	.uart_send_sta(uart_send_sta)
+	.uart_send_sta(uart_send_sta),
+	.nxtsta(uart_ctrl_nxtsta)
 	);
 	uart __uart(
-		.clk(clk),
+		.fclk(clk),
+		.clk(u_clk),
 		.rst(rst),
 	.send(uart_send),
 	.rx(rx),
@@ -186,7 +200,7 @@ module capiano(
 	assign debug_out2 = uart_send_sta;
 	assign debug_out3 = {3'b0,uart_ctrl_send_done};
 	assign debug_out4 = {3'b0,uart_send_done};
-	assign debug_out5 = {3'b0,uart_send};
-	assign debug_out6 = uart_ctrl_sta[7:4];
-	assign debug_out7 = uart_read_data[7:4];
+	assign debug_out5 = uart_ctrl_nxtsta[3:0];
+	assign debug_out6 = uart_test_nxtsta[3:0];
+	assign debug_out7 ={3'b0,uart_ctrl_send};
 endmodule
