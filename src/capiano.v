@@ -39,16 +39,9 @@ module capiano(
 	dig_ctrl __dig_7( .dig(debug_out7), .light(led[55:49]) );
 
 	wire [31:0] clks;
-	wire hf_clk;
-	wire qu_clk;
-	wire d8_clk;
-	wire d16_clk;
 	quarter_clk __quarter_clk(
 		.raw_clk(clk),
-		.qu(qu_clk),
-		.half(hf_clk),
-		.d8(d8_clk),
-		.d16(d16_clk)
+		.out_clk(clks)
 	);
 	assign hf_clk = clks[0];
 	assign qu_clk = clks[1];
@@ -74,7 +67,8 @@ module capiano(
 	assign ov_mclk = qu_clk;
 	camera_ctrl __cam0(
 		.mem_clk(qu_clk),
-		.clk(d16_clk),
+		.clk(qu_clk),
+		.rst(rst),
 		.cam_data(cam_data),
 		.ov_vs(ov_vs),
 		.ov_hs(ov_hs),
@@ -99,7 +93,7 @@ module capiano(
 
 	// debug output from right to left 0 to 7
 	wire [31:0] _out;
-	assign _out = sccb_out;
+	assign _out = cam_out;
 	assign debug_out0 = _out[3:0];
 	assign debug_out1 = _out[7:4];
 	assign debug_out2 = _out[11:8];

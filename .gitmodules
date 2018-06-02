@@ -1,3 +1,3 @@
-[submodule "src/OV7670-Verilog"]
-	path = src/OV7670-Verilog
-	url = https://github.com/westonb/OV7670-Verilog
+[submodule "OV7670-Verilog"]
+        path = src/OV7670-Verilog
+        url = https://github.com/westonb/OV7670-Verilog
