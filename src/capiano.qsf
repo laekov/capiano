@@ -155,14 +155,12 @@ set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_simulation
 set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/src/output_files/smt.vwf"
 
-set_global_assignment -name VERILOG_FILE camera/sccb_writer.v
 set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/SCCB_interface.v"
 set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/OV7670_config_rom.v"
 set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/OV7670_config.v"
 set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/camera_read.v"
 set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/camera_configure.v"
-set_global_assignment -name VERILOG_FILE camera/hinit/I2C_Controller.v
-set_global_assignment -name VERILOG_FILE camera/hinit/I2C_CCD_Config.v
+set_global_assignment -name VERILOG_FILE camera/sccb_writer.v
 set_global_assignment -name VERILOG_FILE camera/wheel_sccb_checker.v
 set_global_assignment -name VERILOG_FILE camera/iic_driver.v
 set_global_assignment -name VERILOG_FILE camera/sccb_checker.v

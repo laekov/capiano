@@ -1,6 +1,6 @@
 // Camera control for OV7670 with FIFO
-`define CamHeight 239
-`define CamWidth 319
+`define CamHeight 479
+`define CamWidth 639
 module camera_ctrl(
 	input mem_clk,
 	input clk,
