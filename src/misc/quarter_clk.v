@@ -1,23 +1,14 @@
 module quarter_clk(
 	input raw_clk,
-	output wire half,
-	output wire qu,
-	output wire d8,
-	output wire d16
+	output wire[31:0] out_clk
 );
-	reg [3:0] cnt;
-	reg stat;
-
-	assign half = cnt[0];
-	assign qu = cnt[1];
-	assign d8 = cnt[2];
-	assign d16 = cnt[3];
-
+	reg [31:0] clks;
+	assign out_clk = clks;
 	initial begin
-		cnt = 4'b0000;
+		clks = 32'h00000000;
 	end
 
 	always @(posedge raw_clk) begin
-		cnt <= (cnt == 4'b1111) ? 4'b0000 : (cnt + 4'b0001);
+		clks <= (clks == 32'hffffffff) ? 32'h00000000 : (clks + 1);
 	end
 endmodule
