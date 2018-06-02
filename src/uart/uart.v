@@ -10,7 +10,8 @@ module uart(
 	output wire read_done,
 	output wire send_done,
 	output wire [3:0] send_sta,
-	output wire [3:0] subclk
+	output wire [3:0] subclk,
+	output wire [7:0] uart_data
 );
 reg [19:0] cnt;
 reg TX;
@@ -26,6 +27,7 @@ assign read_data=readData;
 assign read_done=readDone;
 assign send_done=sendDone;
 assign send_sta=send_status;
+assign uart_data=sendData;
 assign tx=TX;
 assign subclk=cnt[3:0];
 initial begin

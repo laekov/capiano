@@ -149,14 +149,15 @@ module capiano(
 	wire [3:0] uart_send_sta;
 	wire [3:0] uart_test_nxtsta;
 	wire [7:0] uart_ctrl_sta;
-	wire [3:0] uart_ctrl_nxtsta;
+	wire [7:0] uart_ctrl_nxtsta;
+	wire [7:0] uart_data;
 	uart_clk __uart_clk(
 	.clk(clk),
 	.rst(rst),
 	._uart_clk(u_clk)
 	);
 	uart_test __uart_test(
-	.clk(qu_clk),
+	.clk(clk),
 	.rst(rst),
 	.send_done(uart_ctrl_send_done),
 	.send(uart_ctrl_send),
@@ -164,8 +165,9 @@ module capiano(
 	.sta(uart_test_sta),
 	.nxtsta(uart_test_nxtsta)
 	);
+	wire flag;
 	uart_ctrl __uart_ctrl(
-		.clk(qu_clk),
+		.clk(clk),
 		.rst(rst),
 	.uart_read_done(uart_read_done),
 	.uart_send_done(uart_send_done),
@@ -177,7 +179,8 @@ module capiano(
 	.data(ToPC),
 	.sta(uart_ctrl_sta),
 	.uart_send_sta(uart_send_sta),
-	.nxtsta(uart_ctrl_nxtsta)
+	.nxtsta(uart_ctrl_nxtsta),
+	.flag(flag)
 	);
 	uart __uart(
 		.fclk(clk),
@@ -191,16 +194,17 @@ module capiano(
 	.read_done(uart_read_done),
 	.send_done(uart_send_done),
 	.send_sta(uart_send_sta),
-	.subclk(uart_clk)
+	.subclk(uart_clk),
+	.uart_data(uart_data)
 	);
 	
 	// debug output from right to left 0 to 7
 	assign debug_out0 = uart_test_sta;
-	assign debug_out1 = uart_ctrl_sta[3:0];
-	assign debug_out2 = uart_send_sta;
-	assign debug_out3 = {3'b0,uart_ctrl_send_done};
-	assign debug_out4 = {3'b0,uart_send_done};
-	assign debug_out5 = uart_ctrl_nxtsta[3:0];
-	assign debug_out6 = uart_test_nxtsta[3:0];
-	assign debug_out7 ={3'b0,uart_ctrl_send};
+	assign debug_out1 = uart_test_nxtsta[3:0];
+	assign debug_out2 = uart_ctrl_sta[7:4];
+	assign debug_out3 = ToPC[3:0];
+	assign debug_out4 = ToPC[7:4];
+	assign debug_out5 = uart_send_data[3:0];
+	assign debug_out6 = uart_send_data[7:4];
+	assign debug_out7 ={3'b0,flag};
 endmodule
