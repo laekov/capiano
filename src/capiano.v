@@ -85,9 +85,9 @@ module capiano(
 	);
 
 	wire [31:0] sccb_out;
-	sccb_checker __sccb0(
+	sccb_writer __sccb0(
 		// .clk(clks[23]),
-		.clk(man_clk),
+		.clk(clks[1]),
 		.rst(rst),
 		.scl(scl),
 		.sda(sda),

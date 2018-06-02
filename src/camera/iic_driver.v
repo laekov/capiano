@@ -134,27 +134,28 @@ module iic_driver(
 				8'd30: begin acks[2] <= sda; sda_writing <= 1'b1; _sda <= 1'b0; end
 				8'd31: begin not_working <= 1'b1; end
 				8'd32: begin _sda <= 1'b1; _rd <= 1'b0; _wr <= 1'b0; _done <= 1'b1; end
-				8'h4d: begin sda_writing <= 1'b1; _sda <= 1'b1; not_working <= 1'b1; acks[1] <= sda; end
-				8'h4e: begin _sda <= 1'b0; end
-				8'h4f: begin _sda <= 1'b1; not_working <= 1'b1; end
-				8'h50: begin _sda <= rd_flag[7]; not_working <= 1'b0; end
-				8'h51: begin _sda <= rd_flag[6]; end
-				8'h52: begin _sda <= rd_flag[5]; end
-				8'h53: begin _sda <= rd_flag[4]; end
-				8'h54: begin _sda <= rd_flag[3]; end
-				8'h55: begin _sda <= rd_flag[2]; end
-				8'h56: begin _sda <= rd_flag[1]; end
-				8'h57: begin _sda <= rd_flag[0]; end
-				8'h58: begin sda_writing <= 1'b0; end
-				8'h59: begin acks[2] <= sda; sda_writing <= 1'b0; end
-				8'h5a: begin _data[7] <= sda; end
-				8'h5b: begin _data[6] <= sda; end
-				8'h5c: begin _data[5] <= sda; end
-				8'h5d: begin _data[4] <= sda; end
-				8'h5e: begin _data[3] <= sda; end
-				8'h5f: begin _data[2] <= sda; end
-				8'h60: begin _data[1] <= sda; end
-				8'h61: begin _data[0] <= sda; sda_writing <= 1'b1; _sda <= 1'b1; end
+
+				8'h4d: begin sda_writing <= 1'b1; _sda <= rd_flag[7]; acks[1] <= sda; end
+				8'h4e: begin _sda <= rd_flag[6]; end
+				8'h4f: begin _sda <= rd_flag[5]; end 
+				8'h50: begin _sda <= rd_flag[4]; end
+				8'h51: begin _sda <= rd_flag[3]; end
+				8'h52: begin _sda <= rd_flag[2]; end
+				8'h53: begin _sda <= rd_flag[1]; end
+				8'h54: begin _sda <= rd_flag[0]; end
+				8'h55: begin sda_writing <= 1'b0; not_working <= 1'b1; end
+				8'h56: begin sda_writing <= 1'b1; _sda <= 1'b1; end
+				8'h57: begin _sda <= 1'b0; end
+				8'h58: begin not_working <= 1'b0; sda_writing <= 1'b0; end
+				8'h59: begin _data[7] = sda; end
+				8'h5a: begin _data[6] = sda; end
+				8'h5b: begin _data[5] = sda; end
+				8'h5c: begin _data[4] = sda; end
+				8'h5d: begin _data[3] = sda; end
+				8'h5e: begin _data[2] = sda; end
+				8'h5f: begin _data[1] = sda; end
+				8'h60: begin _data[0] = sda; sda_writing <= 1'b1; _sda <= 1'b0; end
+				8'h61: begin _sda <= 1'b1; end
 				8'h62: begin not_working <= 1'b1; _sda <= 1'b0; end
 				8'h63: begin _sda <= 1'b1; end
 				8'h64: begin _rd <= 1'b0; _wr <= 1'b0; _done <= 1'b1; end
