@@ -38,20 +38,21 @@ module capiano(
 	dig_ctrl __dig_6( .dig(debug_out6), .light(led[48:42]) );
 	dig_ctrl __dig_7( .dig(debug_out7), .light(led[55:49]) );
 
-	wire [31:0] clks;
-	quarter_clk __quarter_clk(
-		.raw_clk(clk),
-		.out_clk(clks)
+	wire clk24;
+	wire clk12;
+	pll __pll(
+		.inclk0(clk),
+		.c0(clk24)
 	);
-	assign hf_clk = clks[0];
-	assign qu_clk = clks[1];
-	assign d8_clk = clks[2];
-	assign d16_clk = clks[3];
+	quarter_clk __divider(
+		.raw_clk(clk24),
+		.out_clk(clk12)
+	);
 
 	wire [31:0] vga_addr;
 	wire [8:0] vga_data;
 	vga_ctrl __vga_ctrl(
-		.clk(qu_clk),
+		.clk(clk24),
 		.rst(!rst),
 		.hs(vga_hs),
 		.vs(vga_vs),
@@ -64,10 +65,9 @@ module capiano(
 
 	wire [31:0] cam_out;
 	wire cam0_en;
-	assign ov_mclk = qu_clk;
+	assign ov_mclk = clk12;
 	camera_ctrl __cam0(
-		.mem_clk(qu_clk),
-		.clk(qu_clk),
+		.mem_clk(clk24),
 		.rst(rst),
 		.cam_data(cam_data),
 		.ov_vs(ov_vs),
@@ -83,7 +83,7 @@ module capiano(
 	wire [31:0] sccb_out;
 	sccb_writer __sccb0(
 		// .clk(clks[23]),
-		.clk(clks[1]),
+		.clk(clk12),
 		.rst(rst),
 		.scl(scl),
 		.sda(sda),
