@@ -40,13 +40,18 @@ module capiano(
 
 	wire clk24;
 	wire clk12;
+	wire clk6;
 	pll __pll(
 		.inclk0(clk),
 		.c0(clk24)
 	);
-	quarter_clk __divider(
+	quarter_clk __divider1(
 		.raw_clk(clk24),
 		.out_clk(clk12)
+	);
+	quarter_clk __divider2(
+		.raw_clk(clk12),
+		.out_clk(clk6)
 	);
 
 	wire [31:0] vga_addr;
@@ -80,20 +85,9 @@ module capiano(
 		.debug_out(cam_out)
 	);
 
-	wire [31:0] sccb_out;
-	sccb_writer __sccb0(
-		// .clk(clks[23]),
-		.clk(clk12),
-		.rst(rst),
-		.scl(scl),
-		.sda(sda),
-		.debug_out(sccb_out),
-		.work_done(cam0_en)
-	);
-
 	// debug output from right to left 0 to 7
 	wire [31:0] _out;
-	assign _out = cam_out;
+	// assign _out = {15'b0, cam0_en, cam_out[15:0]};
 	assign debug_out0 = _out[3:0];
 	assign debug_out1 = _out[7:4];
 	assign debug_out2 = _out[11:8];

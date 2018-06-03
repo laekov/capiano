@@ -54,20 +54,32 @@ module camera_ctrl(
 	end
 
 	always @(posedge frame_done) begin
-		debug_out <= {cur_x, cur_y};
+		debug_out[15:0] <= {cur_y};
 	end
+
+	reg [15:0] prvd;
+	wire [8:0] cur_q;
+	yuv2rgb __yuv_converter(
+		.yuv({prvd, data}),
+		.rgb(cur_q)
+	);
 
 	always @(posedge ov_pclk or negedge rst) begin
 		if (!rst) begin
-			cur_x <= 16'h0;
+			cur_x <= `CamWidth;
 			cur_y <= 16'h0;
 		end else if (pixel_valid) begin
-			cvs[{cur_y[8:2], cur_x[9:2]}] <= {data[7:5], data[2:0], data[12:10]};
-			if (cur_x < `CamWidth) begin
-				cur_x <= cur_x + 1;
+			if (cur_x[0]) begin
+				prvd <= data;
+			end else begin
+				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
+			end
+			debug_out[31:16] <= data;
+			if (cur_x > 0) begin
+				cur_x <= cur_x - 1;
 				cur_y <= cur_y;
 			end else begin 
-				cur_x <= 16'h0000;
+				cur_x <= `CamWidth;
 				cur_y <= cur_y + 1;
 			end
 		end else if (frame_done) begin
