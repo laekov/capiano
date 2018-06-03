@@ -210,6 +210,7 @@ set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_simulation
 set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/src/output_files/smt.vwf"
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_global_assignment -name VERILOG_FILE uart/uart_clk.v
 set_global_assignment -name VERILOG_FILE uart/uart_test.v
 set_global_assignment -name VERILOG_FILE uart/uart_ctrl.v
 set_global_assignment -name VERILOG_FILE uart/uart.v
