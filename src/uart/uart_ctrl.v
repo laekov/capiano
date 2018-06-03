@@ -1,5 +1,5 @@
-`define SendToPC 31
-`define SendToPCSize 32
+`define SendToPC 39
+`define SendToPCSize 40
 module uart_ctrl(
 	input clk,
 	input rst,
@@ -42,7 +42,7 @@ initial begin
 	tosend<=1'b0;
 	sendDone<=1'b0;
 end
-always @(rst,send,uart_send_done,uart_send_sta,send_status)begin
+always @(rst,send_status)begin
   if(!rst)nxt_send_sta<=0;
   else begin
     case (send_status)
@@ -55,9 +55,11 @@ always @(rst,send,uart_send_done,uart_send_sta,send_status)begin
       6:nxt_send_sta<=(uart_send_done==1'b1)?7:6;
       7:nxt_send_sta<=(uart_send_sta==9)?7:8;
       8:nxt_send_sta<=(uart_send_done==1'b1)?9:8;
-      9:nxt_send_sta<=0;
-      10:nxt_send_sta<=10;
-      default:nxt_send_sta<=10;
+      9:nxt_send_sta<=(uart_send_sta==9)?9:10;
+      10:nxt_send_sta<=(uart_send_done==1'b1)?11:10;
+      11:nxt_send_sta<=0;
+      12:nxt_send_sta<=12;
+      default:nxt_send_sta<=12;
     endcase
   end
 end
@@ -91,6 +93,11 @@ always @(*)begin
   end
   8:tosend<=1'b1;
   9:begin
+    tosend<=1'b0;
+    sendData<=Data[39:32];
+  end
+  10:tosend<=1'b1;
+  11:begin
     sendDone<=1'b1;
     tosend<=1'b0;
   end

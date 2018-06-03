@@ -1,7 +1,7 @@
 //`define SendToPC 319
 //`define SendToPCSize 320
-`define SendToPC 31
-`define SendToPCSize 32
+`define SendToPC 39
+`define SendToPCSize 40
 module capiano(
 	input man_clk,
 	input clk,
@@ -201,7 +201,7 @@ module capiano(
 	// debug output from right to left 0 to 7
 	assign debug_out0 = uart_test_sta;
 	assign debug_out1 = uart_test_nxtsta[3:0];
-	assign debug_out2 = uart_ctrl_sta[7:4];
+	assign debug_out2 = uart_ctrl_sta[3:0];
 	assign debug_out3 = ToPC[3:0];
 	assign debug_out4 = ToPC[7:4];
 	assign debug_out5 = uart_send_data[3:0];

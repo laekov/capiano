@@ -1,5 +1,5 @@
-`define SendToPC 31
-`define SendToPCSize 32
+`define SendToPC 39
+`define SendToPCSize 40
 module uart_test(
 	input clk,
 	input rst,
@@ -45,7 +45,7 @@ always @(*)begin
 		1:begin
 			tosend<=1'b1;
 			//Data<=32'b0;
-			Data<=32'b00000000000000001111111111111111;
+			Data<=40'b1111111111111111111111111111111111111111;
 			//Data<=32'b11111111111111111111111111111111;
 		end
 		2:tosend<=1'b1;
