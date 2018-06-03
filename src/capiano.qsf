@@ -159,6 +159,10 @@ set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/
 
 
 
+set_global_assignment -name VERILOG_FILE misc/filter_adder.v
+set_global_assignment -name VERILOG_FILE capture/ui.v
+set_global_assignment -name VERILOG_FILE capture/recognizer.v
+set_global_assignment -name VERILOG_FILE capture/isfinger.v
 set_global_assignment -name VERILOG_FILE camera/yuv2rgb.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_Controller.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_CCD_Config.v

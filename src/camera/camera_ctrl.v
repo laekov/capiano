@@ -15,6 +15,7 @@ module camera_ctrl(
 	
 	input [31:0] addr,
 	output reg [8:0] q,
+	output reg [1:0] delta,
 	output reg [31:0] debug_out
 );
 	initial begin
@@ -27,6 +28,7 @@ module camera_ctrl(
 	assign ov_rst = 1'b1;
 
 	reg [8:0] cvs [0:32767];
+	reg finger [0:32767];
 
 	wire [15:0] data;
 	wire pixel_valid;
@@ -64,6 +66,17 @@ module camera_ctrl(
 		.rgb(cur_q)
 	);
 
+	wire thisisfinger;
+	isfinger __is_finger(
+		.q(cur_q),
+		.is_finger(thisisfinger)
+	);
+
+	reg old_finger;
+	always @(posedge ov_pclk) begin
+		old_finger <= finger[{cur_y[8:2], cur_x[9:2]}];
+	end
+
 	always @(posedge ov_pclk or negedge rst) begin
 		if (!rst) begin
 			cur_x <= `CamWidth;
@@ -71,8 +84,15 @@ module camera_ctrl(
 		end else if (pixel_valid) begin
 			if (cur_x[0]) begin
 				prvd <= data;
+				delta <= 2'b00;
 			end else begin
 				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
+				if (thisisfinger == old_finger) begin
+					delta <= 2'b00;
+				end else begin
+					delta <= {1'b1, thisisfinger};
+				end
+				finger[{cur_y[8:2], cur_x[9:2]}] <= thisisfinger;
 			end
 			debug_out[31:16] <= data;
 			if (cur_x > 0) begin

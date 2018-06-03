@@ -24,9 +24,9 @@ module yuv2rgb(
 	assign d = u - 128;
 	assign e = v - 128;
 
-	assign _r = (256 * c + 291 * e + 128);
-	assign _g = (256 * c - 100 * d - 148 * e + 128);
-	assign _b = (256 * c + 520 * d + 128);
+	assign _r = (298 * c + 409 * e + 128);
+	assign _g = (298 * c - 100 * d - 298 * e + 128);
+	assign _b = (298 * c + 516 * d + 128);
 
 	assign r = _r[31] ? 0 : ((_r >= 32'h10000) ? 32'hff00: _r);
 	assign g = _g[31] ? 0 : ((_g >= 32'h10000) ? 32'hff00: _g);
