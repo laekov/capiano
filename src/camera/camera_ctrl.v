@@ -99,9 +99,11 @@ module camera_ctrl #(
 				prvd <= data;
 			end else begin
 				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
-				cnt_fingers[key_id] <= cnt_fingers[key_id] +
-					                   {31'b0, thisisfinger} -
-					                   {31'b0, old_finger};
+				if (key_id <= NUM_KEYS) begin
+					cnt_fingers[key_id] <= cnt_fingers[key_id] +
+					                       {31'b0, thisisfinger} -
+										   {31'b0, old_finger};
+				end
 				finger[{cur_y[8:1], cur_x[9:1]}] <= thisisfinger;
 			end
 			if (cur_x > 0) begin
