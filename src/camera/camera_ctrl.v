@@ -1,7 +1,9 @@
 // Camera control for OV7670 with FIFO
 `define CamHeight 479
 `define CamWidth 639
-module camera_ctrl(
+module camera_ctrl #(
+	parameter NUM_KEYS = 39
+) (
 	input mem_clk,
 	input rst,
 	input [7:0] cam_data,
@@ -15,7 +17,7 @@ module camera_ctrl(
 	
 	input [31:0] addr,
 	output reg [8:0] q,
-	output reg [1:0] delta,
+	output reg [NUM_KEYS:0] key_down,
 	output reg [31:0] debug_out
 );
 	initial begin
@@ -28,7 +30,7 @@ module camera_ctrl(
 	assign ov_rst = 1'b1;
 
 	reg [8:0] cvs [0:32767];
-	reg finger [0:32767];
+	reg finger [0:131072];
 
 	wire [15:0] data;
 	wire pixel_valid;
@@ -74,27 +76,34 @@ module camera_ctrl(
 
 	reg old_finger;
 	always @(posedge ov_pclk) begin
-		old_finger <= finger[{cur_y[8:2], cur_x[9:2]}];
+		old_finger <= finger[{cur_y[8:1], cur_x[9:1]}];
 	end
+
+	integer x_i;
+
+	wire [15:0] key_id;
+	reg [31:0] cnt_fingers [NUM_KEYS:0];
+	assign key_id = {4'b0, cur_x[15:4]};
+	integer i;
 
 	always @(posedge ov_pclk or negedge rst) begin
 		if (!rst) begin
 			cur_x <= `CamWidth;
 			cur_y <= 16'h0;
+			for (i = 0; i <= NUM_KEYS; i = i + 1) begin
+				cnt_fingers[i] <= 0;
+			end
+			debug_out[31:16] <= 16'habcd;
 		end else if (pixel_valid) begin
 			if (cur_x[0]) begin
 				prvd <= data;
-				delta <= 2'b00;
 			end else begin
 				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
-				if (thisisfinger == old_finger) begin
-					delta <= 2'b00;
-				end else begin
-					delta <= {1'b1, thisisfinger};
-				end
-				finger[{cur_y[8:2], cur_x[9:2]}] <= thisisfinger;
+				cnt_fingers[key_id] <= cnt_fingers[key_id] +
+					                   {31'b0, thisisfinger} -
+					                   {31'b0, old_finger};
+				finger[{cur_y[8:1], cur_x[9:1]}] <= thisisfinger;
 			end
-			debug_out[31:16] <= data;
 			if (cur_x > 0) begin
 				cur_x <= cur_x - 1;
 				cur_y <= cur_y;
@@ -103,6 +112,12 @@ module camera_ctrl(
 				cur_y <= cur_y + 1;
 			end
 		end else if (frame_done) begin
+			debug_out[31:16] <= cnt_fingers[10][15:0];
+			for (x_i = 0; x_i <= NUM_KEYS; x_i = x_i + 1) begin
+				key_down[x_i] <= (!cnt_fingers[x_i][31] &&
+					              cnt_fingers[x_i] > 30);
+				cnt_fingers[x_i] <= 0;
+			end
 			cur_x <= 16'h0;
 			cur_y <= 16'h0;
 		end

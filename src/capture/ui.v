@@ -13,15 +13,14 @@ module ui #(
 		.q(canvas_color),
 		.is_finger(is_finger)
 	);
-	assign _q = is_finger ? 9'b111000000 : canvas_color;
 	wire [15:0] y;
 	wire [15:0] x;
-	wire [12:0] key_id;
+	wire [15:0] key_id;
 	wire this_down;
 
 	assign y = addr[31:16];
 	assign x = addr[15:0];
-	assign key_id = addr[15:3];
+	assign key_id = {4'b0, addr[15:4]};
 	assign this_down = key_id <= NUM_KEYS ? key_down[key_id] : 1'b0;
 
 	wire is_key;
@@ -34,6 +33,8 @@ module ui #(
 	assign is_key_vertical_line = is_key && (x[3:0] < 2);
 	assign is_key_horizontal_line = (y < 320 && y > 317);
 	assign filter = is_key_horizontal_line ? 9'b000100000 : (is_key ? (this_down ? 9'b100100000 : 9'b110110110) : 9'b0);
+
+	assign _q = is_finger ? 9'b111000000 : (this_down && is_key ? 9'b111111100 : canvas_color);
 
 	filter_adder ar(
 		.in_1(_q[8:6]),

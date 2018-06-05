@@ -73,6 +73,8 @@ module capiano(
 	assign ov_mclk = clk12;
 	wire [8:0] cam_vga_data;
 	wire [1:0] cam_delta;
+	wire cam_refr;
+	wire [39:0] key_down;
 	camera_ctrl __cam0(
 		.mem_clk(clk24),
 		.rst(rst),
@@ -83,18 +85,9 @@ module capiano(
 		.ov_rst(ov_rst),
 		.ov_pwdn(ov_pwdn),
 		.addr(vga_addr),
+		.key_down(key_down),
 		.q(cam_vga_data),
-		.delta(cam_delta),
 		.debug_out(cam_out)
-	);
-
-	wire [39:0] key_down;
-	recognizer __recog(
-		.clk(ov_pclk),
-		.rst(rst),
-		.addr(vga_addr),
-		.q(cam_delta),
-		.key_down(key_down)
 	);
 
 	ui __ui(
@@ -106,12 +99,7 @@ module capiano(
 
 	// debug output from right to left 0 to 7
 	wire [31:0] _out;
-	reg [3:0] cntt;
-	initial cntt = 0;
-	always @(posedge man_clk) begin
-		cntt <= cntt + 1;
-	end
-	assign _out[3:0] = cntt;
+	assign _out = cam_out;
 	// assign _out = {15'b0, cam0_en, cam_out[15:0]};
 	assign debug_out0 = _out[3:0];
 	assign debug_out1 = _out[7:4];
