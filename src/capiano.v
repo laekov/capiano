@@ -170,6 +170,7 @@ wire [7:0] uart_data;
 uart_clk __uart_clk(
 	.clk(clk),
 	.rst(rst),
+	._uart_clk(u_clk)
 );
 wire flag;
 uart_ctrl __uart_ctrl(
@@ -188,10 +189,10 @@ uart_ctrl __uart_ctrl(
 	.nxtsta(uart_ctrl_nxtsta),
 	.flag(flag)
 );
-assign u_clk = clk24;
+//assign u_clk = clk24;
 uart __uart(
-	.fclk(clk24),
-	.clk(clk24),
+	.fclk(clk),
+	.clk(u_clk),
 	.rst(rst),
 	.send(uart_send),
 	.rx(rx),
