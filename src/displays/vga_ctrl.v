@@ -45,10 +45,6 @@ module vga_ctrl(
 	assign g = (cur_x < `ValidWidth && cur_y < `ValidHeight) ? _g : 3'b0;
 	assign b = (cur_x < `ValidWidth && cur_y < `ValidHeight) ? _b : 3'b0;
 
-	reg [`Coor] b_y;
-	initial begin
-		b_y = 16'd300;
-	end
 
 	always @(*) begin
 		if (hs && vs) begin

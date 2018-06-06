@@ -1,69 +1,127 @@
 // Camera control for OV7670 with FIFO
-`define CvsHeight 119
-`define CvsWidth 159
-module camera_ctrl(
-	input clk,
+`define CamHeight 479
+`define CamWidth 639
+module camera_ctrl #(
+	parameter NUM_KEYS = 39
+) (
+	input mem_clk,
+	input rst,
 	input [7:0] cam_data,
-	output wire rclk,
-	output wire fifo_wen,
-	output wire fifo_wrst,
-	output wire fifo_rrst,
-	output wire fifo_oe,
-	input ov_vsync,
+	input work_en,
+
+	input ov_vs,
+	input ov_hs,
+	input ov_pclk,
+	output wire ov_rst,
+	output wire ov_pwdn,
 	
 	input [31:0] addr,
-	output wire [8:0] q
+	output reg [8:0] q,
+	output reg [NUM_KEYS:0] key_down,
+	output reg [31:0] debug_out
 );
+	initial begin
+		debug_out = 32'h0;
+	end
+	always @(posedge ov_pclk) begin
+	end
 
-	reg [8:0] cvs [0:`CvsHeight][0:`CvsWidth];
+	assign ov_pwdn = 1'b0;
+	assign ov_rst = 1'b1;
 
-	// assign q = (addr[31:17] <= `CvsHeight && addr[15:1] <= `CvsWidth) ? cvs[addr[31:17]][addr[15:1]] : 9'b000000000;
-	reg [8:0] _q;
-	assign q = _q;
+	reg [8:0] cvs [0:32767];
+	reg finger [0:131072];
 
-	reg _rrst;
-	reg _wrst;
+	wire [15:0] data;
+	wire pixel_valid;
+	wire frame_done;
 
-	assign rclk = clk;
-	assign fifo_oe = 1'b0;
-	assign fifo_wen = 1'b1;
-	assign fifo_rrst = _rrst;
-	assign fifo_wrst = _wrst;
+	camera_read __reader(
+		.p_clock(ov_pclk),
+		.vsync(ov_vs),
+		.href(ov_hs),
+		.p_data(cam_data),
+		.pixel_data(data),
+		.pixel_valid(pixel_valid),
+		.frame_done(frame_done)
+	);
 
 	reg [15:0] cur_x;
 	reg [15:0] cur_y;
-	reg [15:0] data;
-
-	reg [1:0] stat;
-
 	initial begin
 		cur_x = 16'h0000;
 		cur_y = 16'h0000;
-		_rrst = 1'b1;
-		_wrst = 1'b1;
-		stat = 2'b00;
 	end
 
-	always @(posedge rclk) begin
-		if (stat == 2'b00) begin
-			// cvs[cur_y[15:2]][cur_x[15:2]] <= { data[14:12], data[9:7], data[4:2] };
-			_q <= { data[15:13], data[10:8], data[4:2] };
-			data[7:0] <= cam_data;
-			stat <= 2'b01;
-		end else if (stat == 2'b01) begin
-			data[15:8] <= cam_data;
-			if (cur_x == `CvsWidth) begin
-				cur_x <= 16'h0000;
-			end else begin
-				cur_x <= cur_x + 16'h0001;
-				if (cur_y == `CvsHeight) begin
-					cur_y <= 16'h0000;
-				end else begin
-					cur_y <= cur_y + 16'h0001;
-				end
+	always @(posedge mem_clk) begin
+		q <= cvs[{addr[24:18], addr[9:2]}];
+	end
+
+	always @(posedge frame_done) begin
+		debug_out[15:0] <= {cur_y};
+	end
+
+	reg [15:0] prvd;
+	wire [8:0] cur_q;
+	yuv2rgb __yuv_converter(
+		.yuv({prvd, data}),
+		.rgb(cur_q)
+	);
+
+	wire thisisfinger;
+	isfinger __is_finger(
+		.q(cur_q),
+		.is_finger(thisisfinger)
+	);
+
+	reg old_finger;
+	always @(posedge ov_pclk) begin
+		old_finger <= finger[{cur_y[8:1], cur_x[9:1]}];
+	end
+
+	integer x_i;
+
+	wire [15:0] key_id;
+	reg [31:0] cnt_fingers [NUM_KEYS:0];
+	assign key_id = {4'b0, cur_x[15:4]};
+	integer i;
+
+	always @(posedge ov_pclk or negedge rst) begin
+		if (!rst) begin
+			cur_x <= `CamWidth;
+			cur_y <= 16'h0;
+			for (i = 0; i <= NUM_KEYS; i = i + 1) begin
+				cnt_fingers[i] <= 0;
 			end
-			stat <= 2'b00;
+			debug_out[31:16] <= 16'habcd;
+		end else if (pixel_valid) begin
+			if (cur_x[0]) begin
+				prvd <= data;
+			end else begin
+				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
+				if (key_id <= NUM_KEYS) begin
+					cnt_fingers[key_id] <= cnt_fingers[key_id] +
+					                       {31'b0, thisisfinger} -
+										   {31'b0, old_finger};
+				end
+				finger[{cur_y[8:1], cur_x[9:1]}] <= thisisfinger;
+			end
+			if (cur_x > 0) begin
+				cur_x <= cur_x - 1;
+				cur_y <= cur_y;
+			end else begin 
+				cur_x <= `CamWidth;
+				cur_y <= cur_y + 1;
+			end
+		end else if (frame_done) begin
+			debug_out[31:16] <= cnt_fingers[10][15:0];
+			for (x_i = 0; x_i <= NUM_KEYS; x_i = x_i + 1) begin
+				key_down[x_i] <= (!cnt_fingers[x_i][31] &&
+					              cnt_fingers[x_i] > 30);
+				cnt_fingers[x_i] <= 0;
+			end
+			cur_x <= 16'h0;
+			cur_y <= 16'h0;
 		end
 	end
 endmodule
-

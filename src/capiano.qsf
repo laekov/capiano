@@ -130,21 +130,21 @@ set_location_assignment PIN_AD23 -to led[55]
 
 set_location_assignment PIN_D20 -to cam_data[7]
 set_location_assignment PIN_D19 -to cam_data[6]
-set_location_assignment PIN_D18 -to cam_data[5]
+set_location_assignment PIN_B18 -to cam_data[5]
 set_location_assignment PIN_D14 -to cam_data[4]
 set_location_assignment PIN_E20 -to cam_data[3]
 set_location_assignment PIN_B19 -to cam_data[2]
 set_location_assignment PIN_A18 -to cam_data[1]
 set_location_assignment PIN_B20 -to cam_data[0]
 
-set_location_assignment PIN_A19 -to rclk
-set_location_assignment PIN_B17 -to scl
-set_location_assignment PIN_A20 -to sda
-set_location_assignment PIN_D17 -to fifo_wen
-set_location_assignment PIN_A17 -to fifo_wrst
-set_location_assignment PIN_C19 -to fifo_rrst
-set_location_assignment PIN_C17 -to fifo_oe
-set_location_assignment PIN_D15 -to ov_vsync
+set_location_assignment PIN_A19 -to scl
+set_location_assignment PIN_B17 -to sda
+set_location_assignment PIN_A20 -to ov_vs
+set_location_assignment PIN_D17 -to ov_hs
+set_location_assignment PIN_A17 -to ov_pclk
+set_location_assignment PIN_C19 -to ov_mclk
+set_location_assignment PIN_C17 -to ov_rst
+set_location_assignment PIN_D15 -to ov_pwdn
 
 set_location_assignment PIN_AE23 -to Mem_addr[19]
 set_location_assignment PIN_AF23 -to Mem_addr[18]
@@ -210,14 +210,33 @@ set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_simulation
 set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/src/output_files/smt.vwf"
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
+
 set_global_assignment -name VERILOG_FILE uart/uart_clk.v
 set_global_assignment -name VERILOG_FILE uart/uart_test.v
 set_global_assignment -name VERILOG_FILE uart/uart_ctrl.v
 set_global_assignment -name VERILOG_FILE uart/uart.v
 set_global_assignment -name VERILOG_FILE sram/ram_test.v
 set_global_assignment -name VERILOG_FILE sram/ram_ctrl.v
+
+
+
+
+
+set_global_assignment -name VERILOG_FILE misc/filter_adder.v
+set_global_assignment -name VERILOG_FILE capture/ui.v
+set_global_assignment -name VERILOG_FILE capture/recognizer.v
+set_global_assignment -name VERILOG_FILE capture/isfinger.v
+set_global_assignment -name VERILOG_FILE camera/yuv2rgb.v
+
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_Controller.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_CCD_Config.v
+set_global_assignment -name VERILOG_FILE camera/hinit/cmos_top.v
+set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/SCCB_interface.v"
+set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/OV7670_config_rom.v"
+set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/OV7670_config.v"
+set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/camera_read.v"
+set_global_assignment -name VERILOG_FILE "OV7670-Verilog/src/camera_configure.v"
+set_global_assignment -name VERILOG_FILE camera/sccb_writer.v
 set_global_assignment -name VERILOG_FILE camera/wheel_sccb_checker.v
 set_global_assignment -name VERILOG_FILE camera/iic_driver.v
 set_global_assignment -name VERILOG_FILE camera/sccb_checker.v
@@ -227,4 +246,11 @@ set_global_assignment -name VERILOG_FILE displays/vga_ctrl.v
 set_global_assignment -name VERILOG_FILE misc/quarter_clk.v
 set_global_assignment -name VERILOG_FILE capiano.v
 set_global_assignment -name VECTOR_WAVEFORM_FILE output_files/smt.vwf
+set_global_assignment -name CDF_FILE output_files/Chain2.cdf
+set_global_assignment -name CDF_FILE output_files/Chain3.cdf
+set_global_assignment -name SOURCE_FILE db/capiano.cmp.rdb
+set_global_assignment -name CDF_FILE output_files/Chain4.cdf
+set_global_assignment -name CDF_FILE output_files/Chain14.cdf
+set_global_assignment -name QIP_FILE misc/pll.qip
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
