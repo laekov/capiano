@@ -211,23 +211,25 @@ set_global_assignment -name EDA_GENERATE_FUNCTIONAL_NETLIST ON -section_id eda_s
 set_global_assignment -name INCREMENTAL_VECTOR_INPUT_SOURCE "E:/quartus/capiano/src/output_files/smt.vwf"
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 
+
+
+
+
+
+
+
+set_global_assignment -name VERILOG_FILE camera/vga_ram.v
 set_global_assignment -name VERILOG_FILE uart/uart_clk.v
 set_global_assignment -name VERILOG_FILE uart/uart_test.v
 set_global_assignment -name VERILOG_FILE uart/uart_ctrl.v
 set_global_assignment -name VERILOG_FILE uart/uart.v
 set_global_assignment -name VERILOG_FILE sram/ram_test.v
 set_global_assignment -name VERILOG_FILE sram/ram_ctrl.v
-
-
-
-
-
 set_global_assignment -name VERILOG_FILE misc/filter_adder.v
 set_global_assignment -name VERILOG_FILE capture/ui.v
 set_global_assignment -name VERILOG_FILE capture/recognizer.v
 set_global_assignment -name VERILOG_FILE capture/isfinger.v
 set_global_assignment -name VERILOG_FILE camera/yuv2rgb.v
-
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_Controller.v
 set_global_assignment -name VERILOG_FILE camera/hinit/I2C_CCD_Config.v
 set_global_assignment -name VERILOG_FILE camera/hinit/cmos_top.v
@@ -252,5 +254,4 @@ set_global_assignment -name SOURCE_FILE db/capiano.cmp.rdb
 set_global_assignment -name CDF_FILE output_files/Chain4.cdf
 set_global_assignment -name CDF_FILE output_files/Chain14.cdf
 set_global_assignment -name QIP_FILE misc/pll.qip
-
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

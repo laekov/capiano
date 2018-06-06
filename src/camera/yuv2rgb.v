@@ -1,6 +1,7 @@
 module yuv2rgb(
 	input [31:0] yuv,
-	output wire [8:0] rgb
+	output wire [8:0] rgb,
+	output wire is_finger
 );
 	wire [31:0] y;
 	wire [31:0] u;
@@ -31,4 +32,6 @@ module yuv2rgb(
 	assign r = _r[31] ? 0 : ((_r >= 32'h10000) ? 32'hff00: _r);
 	assign g = _g[31] ? 0 : ((_g >= 32'h10000) ? 32'hff00: _g);
 	assign b = _b[31] ? 0 : ((_b >= 32'h10000) ? 32'hff00: _b);
+
+	assign is_finger = r < 200 && g > 100 && b < 200;
 endmodule

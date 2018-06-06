@@ -4,7 +4,7 @@
 module camera_ctrl #(
 	parameter NUM_KEYS = 39
 ) (
-	input mem_clk,
+	input clk,
 	input rst,
 	input [7:0] cam_data,
 	input work_en,
@@ -16,7 +16,8 @@ module camera_ctrl #(
 	output wire ov_pwdn,
 	
 	input [31:0] addr,
-	output reg [8:0] q,
+	output wire [8:0] q,
+	output wire is_finger,
 	output reg [NUM_KEYS:0] key_down,
 	output reg [31:0] debug_out
 );
@@ -29,8 +30,26 @@ module camera_ctrl #(
 	assign ov_pwdn = 1'b0;
 	assign ov_rst = 1'b1;
 
-	reg [8:0] cvs [0:32767];
-	reg finger [0:131072];
+	reg [14:0] c_addr;
+	reg [8:0] c_data;
+	reg f_data;
+	reg [17:0] f_addr;
+	wire [17:0] f_rd_addr;
+	wire f_rd_data;
+
+	vga_ram __vga_ram(
+		.clk(clk),
+		.rst(rst),
+		.c_addr(c_addr),
+		.c_data(c_data),
+		.f_addr(f_addr),
+		.f_data(f_data),
+		.f_rd_addr(f_rd_addr),
+		.f_rd_data(f_rd_data),
+		.addr(addr),
+		.is_finger(is_finger),
+		.q(q)
+	);
 
 	wire [15:0] data;
 	wire pixel_valid;
@@ -53,30 +72,29 @@ module camera_ctrl #(
 		cur_y = 16'h0000;
 	end
 
-	always @(posedge mem_clk) begin
-		q <= cvs[{addr[24:18], addr[9:2]}];
-	end
-
 	always @(posedge frame_done) begin
-		debug_out[15:0] <= {cur_y};
+		debug_out[11:0] <= cur_y[11:0];
 	end
 
 	reg [15:0] prvd;
 	wire [8:0] cur_q;
+	wire _is_finger;
 	yuv2rgb __yuv_converter(
 		.yuv({prvd, data}),
+		.is_finger(_is_finger),
 		.rgb(cur_q)
 	);
 
-	wire thisisfinger;
-	isfinger __is_finger(
-		.q(cur_q),
-		.is_finger(thisisfinger)
-	);
 
-	reg old_finger;
-	always @(posedge ov_pclk) begin
-		old_finger <= finger[{cur_y[8:1], cur_x[9:1]}];
+	wire this_finger;
+	assign this_finger = (cur_y > 16'd320) && _is_finger;
+
+	assign f_rd_addr = {cur_y[8:1], cur_x[9:1]};
+	wire old_finger;
+	assign old_finger = f_rd_data;
+	reg [31:0] cnt_rst;
+	initial begin
+		cnt_rst = 0;
 	end
 
 	integer x_i;
@@ -94,17 +112,23 @@ module camera_ctrl #(
 				cnt_fingers[i] <= 0;
 			end
 			debug_out[31:16] <= 16'habcd;
+			cnt_rst <= 0;
 		end else if (pixel_valid) begin
 			if (cur_x[0]) begin
 				prvd <= data;
 			end else begin
-				cvs[{cur_y[8:2], cur_x[9:2]}] <= cur_q;
+				c_addr <= {cur_y[8:2], cur_x[9:2]};
+				c_data <= cur_q;
+				if (cur_x == 16'h00f0 && cur_y == 16'h00f0) begin
+					debug_out[31:20] <= {3'b0, cur_q};
+				end
 				if (key_id <= NUM_KEYS) begin
 					cnt_fingers[key_id] <= cnt_fingers[key_id] +
-					                       {31'b0, thisisfinger} -
+					                       {31'b0, this_finger} -
 										   {31'b0, old_finger};
 				end
-				finger[{cur_y[8:1], cur_x[9:1]}] <= thisisfinger;
+				f_addr <= {cur_y[8:1], cur_x[9:1]};
+				f_data <= this_finger;
 			end
 			if (cur_x > 0) begin
 				cur_x <= cur_x - 1;
@@ -114,7 +138,15 @@ module camera_ctrl #(
 				cur_y <= cur_y + 1;
 			end
 		end else if (frame_done) begin
-			debug_out[31:16] <= cnt_fingers[10][15:0];
+			if (cnt_rst > 30) begin
+				for (x_i = 0; x_i <= NUM_KEYS; x_i = x_i + 1) begin
+					cnt_fingers[x_i] <= 0;
+				end
+				cnt_rst <= 0;
+			end else begin
+				cnt_rst <= cnt_rst + 1;
+			end
+			debug_out[19:12] <= cnt_fingers[10][7:0];
 			for (x_i = 0; x_i <= NUM_KEYS; x_i = x_i + 1) begin
 				key_down[x_i] <= (!cnt_fingers[x_i][31] &&
 					              cnt_fingers[x_i] > 30);

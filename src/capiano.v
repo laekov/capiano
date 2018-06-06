@@ -69,6 +69,7 @@ quarter_clk __divider2(
 
 wire [31:0] vga_addr;
 wire [8:0] vga_data;
+wire [8:0] cam_vga_data;
 vga_ctrl __vga_ctrl(
 	.clk(clk24),
 	.rst(!rst),
@@ -84,12 +85,12 @@ vga_ctrl __vga_ctrl(
 wire [31:0] cam_out;
 wire cam0_en;
 assign ov_mclk = clk12;
-wire [8:0] cam_vga_data;
 wire [1:0] cam_delta;
 wire cam_refr;
 wire [39:0] key_down;
+wire cis_finger;
 camera_ctrl __cam0(
-	.mem_clk(clk24),
+	.clk(clk24),
 	.rst(rst),
 	.cam_data(cam_data),
 	.ov_vs(ov_vs),
@@ -100,12 +101,14 @@ camera_ctrl __cam0(
 	.addr(vga_addr),
 	.key_down(key_down),
 	.q(cam_vga_data),
+	.is_finger(cis_finger),
 	.debug_out(cam_out)
 );
 
 ui __ui(
 	.addr(vga_addr),
 	.canvas_color(cam_vga_data),
+	.is_finger(cis_finger),
 	.key_down(key_down),
 	.q(vga_data)
 );
@@ -158,7 +161,6 @@ wire uart_send;
 wire u_clk;
 wire [7:0] uart_read_data;
 wire [7:0] uart_send_data;
-wire [`SendToPC:0] ToPC;
 wire [3:0] uart_test_sta;
 wire [3:0] uart_send_sta;
 wire [3:0] uart_test_nxtsta;
@@ -169,10 +171,9 @@ uart_clk __uart_clk(
 	.clk(clk),
 	.rst(rst),
 );
-assign ToPC = key_down;
 wire flag;
 uart_ctrl __uart_ctrl(
-	.clk(clk),
+	.clk(clk24),
 	.rst(rst),
 	.uart_read_done(uart_read_done),
 	.uart_send_done(uart_send_done),
@@ -181,7 +182,7 @@ uart_ctrl __uart_ctrl(
 	.send_data(uart_send_data),
 	.send_done(uart_ctrl_send_done),
 	.send(uart_ctrl_send),
-	.data(ToPC),
+	.data(key_down),
 	.sta(uart_ctrl_sta),
 	.uart_send_sta(uart_send_sta),
 	.nxtsta(uart_ctrl_nxtsta),
@@ -189,8 +190,8 @@ uart_ctrl __uart_ctrl(
 );
 assign u_clk = clk24;
 uart __uart(
-	.fclk(clk),
-	.clk(u_clk),
+	.fclk(clk24),
+	.clk(clk24),
 	.rst(rst),
 	.send(uart_send),
 	.rx(rx),
@@ -200,7 +201,6 @@ uart __uart(
 	.read_done(uart_read_done),
 	.send_done(uart_send_done),
 	.send_sta(uart_send_sta),
-	.subclk(uart_clk),
 	.uart_data(uart_data)
 );
 
