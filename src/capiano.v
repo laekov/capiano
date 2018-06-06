@@ -90,6 +90,7 @@ wire cam_refr;
 wire [39:0] key_down;
 wire cis_finger;
 camera_ctrl __cam0(
+	.man_clk(man_clk),
 	.clk(clk24),
 	.rst(rst),
 	.cam_data(cam_data),

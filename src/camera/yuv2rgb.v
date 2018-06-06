@@ -1,37 +1,73 @@
 module yuv2rgb(
+	input clk,
+	input man_clk,
 	input [31:0] yuv,
 	output wire [8:0] rgb,
-	output wire is_finger
+	output wire is_finger,
+	output wire [31:0] debug_out
 );
-	wire [31:0] y;
-	wire [31:0] u;
-	wire [31:0] v;
-	wire [31:0] c;
-	wire [31:0] d;
-	wire [31:0] e;
+	reg [31:0] y;
+	reg [31:0] u;
+	reg [31:0] v;
+	reg [31:0] c;
+	reg [31:0] d0;
+	reg [31:0] d1;
+	reg [31:0] e0;
+	reg [31:0] e1;
 	wire [31:0] r;
 	wire [31:0] g;
 	wire [31:0] b;
-	wire [31:0] _r;
-	wire [31:0] _g;
-	wire [31:0] _b;
+	reg [31:0] _r;
+	reg [31:0] _g;
+	reg [31:0] _b;
 	assign rgb = {r[15:13], g[15:13], b[15:13]};
 
-	assign y = {24'b0, yuv[23:16]};
-	assign u = {24'b0, yuv[15:8]};
-	assign v = {24'b0, yuv[31:24]};
+	always @(posedge clk) begin
+		y = {24'b0, yuv[23:16]} - 16;
+		u = {24'b0, yuv[15:8]} - 128;
+		v = {24'b0, yuv[31:24]} - 128;
+	end
 
-	assign c = y - 16;
-	assign d = u - 128;
-	assign e = v - 128;
+	always @(posedge clk) begin
+		c <= y * 298;
+		d0 <= u * 100;
+		d1 <= u * 516;
+		e0 <= v * 409;
+		e1 <= v * 298;
+	end
 
-	assign _r = (298 * c + 409 * e + 128);
-	assign _g = (298 * c - 100 * d - 298 * e + 128);
-	assign _b = (298 * c + 516 * d + 128);
+	always @(posedge clk) begin
+		_r = c + e0 + 128;
+		_g = c - d0 - e1 + 128;
+		_b = c + d1 + 128;
+	end
 
 	assign r = _r[31] ? 0 : ((_r >= 32'h10000) ? 32'hff00: _r);
 	assign g = _g[31] ? 0 : ((_g >= 32'h10000) ? 32'hff00: _g);
 	assign b = _b[31] ? 0 : ((_b >= 32'h10000) ? 32'hff00: _b);
 
-	assign is_finger = r < 200 && g > 100 && b < 200;
+	reg [31:0] r_thres;
+	reg [31:0] g_thres;
+	reg [31:0] b_thres;
+	initial begin
+		r_thres = 35600;
+		g_thres = 51200;
+		b_thres = 35600;
+	end
+
+	always @(posedge man_clk) begin
+		if (r_thres < 65535) begin
+			r_thres <= r_thres + 1024;
+		end else begin
+			r_thres <= 0;
+		end
+		if (b_thres < 65535) begin
+			b_thres <= b_thres + 1024;
+		end else begin
+			b_thres <= 0;
+		end
+	end
+
+	assign debug_out[15:0] = {8'b0, r_thres[15:8], g_thres[15:8], b_thres[15:8]};
+	assign is_finger = r < r_thres && g > g_thres && b < b_thres;
 endmodule
