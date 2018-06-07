@@ -5,7 +5,6 @@ module camera_ctrl #(
 	parameter NUM_KEYS = 39
 ) (
 	input clk,
-	input man_clk,
 	input rst,
 	input [7:0] cam_data,
 	input work_en,
@@ -20,11 +19,12 @@ module camera_ctrl #(
 	output wire [8:0] q,
 	output wire is_finger,
 	output reg [NUM_KEYS:0] key_down,
-	output wire [31:0] debug_out
+	output wire [31:0] debug_out,
+	input [31:0] r_max,
+	input [31:0] g_min,
+	input [31:0] b_max,
+	input [31:0] c_min
 );
-	always @(posedge ov_pclk) begin
-	end
-
 	assign ov_pwdn = 1'b0;
 	assign ov_rst = 1'b1;
 
@@ -76,11 +76,13 @@ module camera_ctrl #(
 
 	wire [31:0] yuv_out;
 	yuv2rgb __yuv_converter(
-		.man_clk(man_clk),
 		.clk(ov_pclk),
 		.yuv({prvd, data}),
 		.is_finger(_is_finger),
 		.rgb(cur_q),
+		.r_max(r_max),
+		.g_min(g_min),
+		.b_max(b_max),
 		.debug_out(yuv_out)
 	);
 	assign debug_out = yuv_out;
@@ -143,7 +145,7 @@ module camera_ctrl #(
 			end
 			for (x_i = 0; x_i <= NUM_KEYS; x_i = x_i + 1) begin
 				key_down[x_i] <= (!cnt_fingers[x_i][31] &&
-					              cnt_fingers[x_i] > 15);
+					              cnt_fingers[x_i] > c_min);
 				cnt_fingers[x_i] <= 0;
 			end
 			cur_x <= 16'h0;

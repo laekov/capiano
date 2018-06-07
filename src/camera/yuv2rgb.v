@@ -1,7 +1,9 @@
 module yuv2rgb(
 	input clk,
-	input man_clk,
 	input [31:0] yuv,
+	input [31:0] r_max,
+	input [31:0] g_min,
+	input [31:0] b_max,
 	output wire [8:0] rgb,
 	output wire is_finger,
 	output wire [31:0] debug_out
@@ -46,28 +48,5 @@ module yuv2rgb(
 	assign g = _g[31] ? 0 : ((_g >= 32'h10000) ? 32'hff00: _g);
 	assign b = _b[31] ? 0 : ((_b >= 32'h10000) ? 32'hff00: _b);
 
-	reg [31:0] r_thres;
-	reg [31:0] g_thres;
-	reg [31:0] b_thres;
-	initial begin
-		r_thres = 35600;
-		g_thres = 51200;
-		b_thres = 35600;
-	end
-
-	always @(posedge man_clk) begin
-		if (r_thres < 65535) begin
-			r_thres <= r_thres + 1024;
-		end else begin
-			r_thres <= 0;
-		end
-		if (b_thres < 65535) begin
-			b_thres <= b_thres + 1024;
-		end else begin
-			b_thres <= 0;
-		end
-	end
-
-	assign debug_out[15:0] = {8'b0, r_thres[15:8], g_thres[15:8], b_thres[15:8]};
-	assign is_finger = r < r_thres && g > g_thres && b < b_thres;
+	assign is_finger = r < r_max && g > g_min && b < b_max;
 endmodule
