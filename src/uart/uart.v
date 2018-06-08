@@ -41,11 +41,62 @@ always @(posedge fclk or negedge rst)begin
 	if(!rst)begin
 		read_status<=0;
 		send_status<=0;
+		sendDone<=1'b0;
 	end
 	else begin
 		if(clk==1'b1)begin
 			read_status<=nxt_read_sta;
-			send_status<=nxt_send_sta;
+			case(send_status)
+				0:begin
+					if(send==1'b1)begin
+						sendDone<=1'b0;
+						send_status<=1;
+						TX<=1'b0;
+						sendData<=send_data;
+					end
+					else begin
+						send_status<=0;
+						TX<=1'b1;
+					end
+				end
+				1:begin
+					TX<=sendData[0];
+					send_status<=2;
+				end
+				2:begin
+					TX<=sendData[1];
+					send_status<=3;
+				end
+				3:begin
+					TX<=sendData[2];
+					send_status<=4;
+				end
+				4:begin
+					TX<=sendData[3];
+					send_status<=5;
+				end
+				5:begin
+					TX<=sendData[4];
+					send_status<=6;
+				end
+				6:begin
+					TX<=sendData[5];
+					send_status<=7;
+				end
+				7:begin
+					TX<=sendData[6];
+					send_status<=8;
+				end
+				8:begin
+					TX<=sendData[7];
+					send_status<=9;
+				end
+				9:begin
+					sendDone<=1'b1;
+					TX<=1'b1;
+					send_status<=0;
+				end
+			endcase
 		end
 	end
 end
@@ -67,7 +118,7 @@ end
 //	end
 //end
 
-always @(read_status)begin
+always @(posedge fclk or negedge rst)begin
 	case(read_status)
 		0:begin
 			if(rx==1'b0)begin
@@ -111,59 +162,6 @@ always @(read_status)begin
 		9:begin
 			readDone<=1'b1;
 			nxt_read_sta<=0;
-		end
-	endcase
-end
-always @(send_status)begin
-	case(send_status)
-		0:begin
-			if(send==1'b1)begin
-				sendDone<=1'b0;
-				nxt_send_sta<=1;
-				TX<=1'b0;
-				sendData<=send_data;
-			end
-			else begin
-				nxt_send_sta<=0;
-				TX<=1'b1;
-			end
-		end
-		1:begin
-			TX<=sendData[0];
-			nxt_send_sta<=2;
-		end
-		2:begin
-			TX<=sendData[1];
-			nxt_send_sta<=3;
-		end
-		3:begin
-			TX<=sendData[2];
-			nxt_send_sta<=4;
-		end
-		4:begin
-			TX<=sendData[3];
-			nxt_send_sta<=5;
-		end
-		5:begin
-			TX<=sendData[4];
-			nxt_send_sta<=6;
-		end
-		6:begin
-			TX<=sendData[5];
-			nxt_send_sta<=7;
-		end
-		7:begin
-			TX<=sendData[6];
-			nxt_send_sta<=8;
-		end
-		8:begin
-			TX<=sendData[7];
-			nxt_send_sta<=9;
-		end
-		9:begin
-			sendDone<=1'b1;
-			TX<=1'b1;
-			nxt_send_sta<=0;
 		end
 	endcase
 end

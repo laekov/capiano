@@ -22,45 +22,44 @@ assign nxtsta=nxt_sta;
 //	status<=0;
 //end
 always @(posedge clk or negedge rst)begin
-	if(!rst)status<=0;
-	else status<=nxt_sta;
-end
-always @(status,rst)begin
-	if (!rst) nxt_sta <= 0;
+	if (!rst) status<=0;
 	else begin
 			case (status)
-					0: nxt_sta <= 1;
-					1: nxt_sta <= 2;
-					2: nxt_sta<=(send_done==1'b1)?4:2;
-					3: nxt_sta <= 4;
-					4: nxt_sta <= 4;
-					5: nxt_sta <= 5;
-					default: nxt_sta <= 5;
+					0:begin
+						status <= 1;
+						tosend<=1'b0;
+					end
+					1:begin
+						status <= 2;
+						tosend<=1'b0;
+						Data<=40'b0000000000000000111111001111100111100111;
+					end
+					2:begin
+						if(send_done==1'b1)begin
+							status<=4;
+							tosend<=1'b0;
+						end
+						else begin
+							status<=2;
+							Data<=40'b0000000000000000111111001111100111100111;
+							tosend<=1'b1;
+						end
+					end
+					3:begin
+						tosend<=1'b0;
+						status <= 4;
+					end
+					4:begin
+						tosend<=1'b0;
+						status <= 4;
+					end
+					5:begin
+						tosend<=1'b0;
+						status <= 5;
+					end
+					default: status<=5;
 			endcase
 		end
 end
-always @(*)begin
-	case (status)
-		0:tosend<=1'b0;
-		1:begin
-			tosend<=1'b1;
-			//Data<=32'b0;
-			Data<=40'b1111111111111111111111111111111111111111;
-			//Data<=32'b11111111111111111111111111111111;
-		end
-		2:tosend<=1'b1;
-		3:begin
-			tosend<=1'b0;
-		end
-		4:begin
-			tosend<=1'b0;
-		end
-		5:begin
-			tosend<=1'b0;
-		end
-		default:begin
-			tosend<=1'b0;
-		end
-	endcase
-end
+
 endmodule

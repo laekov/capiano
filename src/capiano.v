@@ -54,6 +54,7 @@ dig_ctrl __dig_7( .dig(debug_out7), .light(led[55:49]) );
 wire clk24;
 wire clk12;
 wire clk6;
+wire clk3;
 pll __pll(
 	.inclk0(clk),
 	.c0(clk24)
@@ -67,6 +68,10 @@ quarter_clk __divider2(
 	.out_clk(clk6)
 );
 
+quarter_clk __divider3(
+	.raw_clk(clk6),
+	.out_clk(clk3)
+);
 wire [31:0] vga_addr;
 wire [8:0] vga_data;
 wire [8:0] cam_vga_data;
@@ -167,14 +172,24 @@ wire [3:0] uart_test_nxtsta;
 wire [7:0] uart_ctrl_sta;
 wire [7:0] uart_ctrl_nxtsta;
 wire [7:0] uart_data;
+wire [39:0] uart_ctrl_data;
 uart_clk __uart_clk(
 	.clk(clk),
 	.rst(rst),
 	._uart_clk(u_clk)
 );
 wire flag;
+uart_test __uart_test(
+	.clk(u_clk),
+	.rst(rst),
+	.send_done(uart_ctrl_send_done),
+	.send(uart_ctrl_send),
+	.data(uart_ctrl_data),
+	.sta(uart_test_sta),
+	.nxtsta(uart_test_nxtsta)
+);
 uart_ctrl __uart_ctrl(
-	.clk(clk24),
+	.clk(u_clk),
 	.rst(rst),
 	.uart_read_done(uart_read_done),
 	.uart_send_done(uart_send_done),
@@ -183,13 +198,12 @@ uart_ctrl __uart_ctrl(
 	.send_data(uart_send_data),
 	.send_done(uart_ctrl_send_done),
 	.send(uart_ctrl_send),
-	.data(key_down),
+	.data(uart_ctrl_data),
 	.sta(uart_ctrl_sta),
 	.uart_send_sta(uart_send_sta),
 	.nxtsta(uart_ctrl_nxtsta),
 	.flag(flag)
 );
-//assign u_clk = clk24;
 uart __uart(
 	.fclk(clk),
 	.clk(u_clk),
@@ -209,12 +223,12 @@ uart __uart(
 wire [31:0] _out;
 assign _out = cam_out;
 // assign _out = {15'b0, cam0_en, cam_out[15:0]};
-assign debug_out0 = _out[3:0];
-assign debug_out1 = _out[7:4];
-assign debug_out2 = _out[11:8];
-assign debug_out3 = _out[15:12];
-assign debug_out4 = _out[19:16];
-assign debug_out5 = _out[23:20];
-assign debug_out6 = _out[27:24];
-assign debug_out7 = _out[31:28];
+assign debug_out0 = uart_test_sta;
+assign debug_out1 = uart_ctrl_sta;
+assign debug_out2 = uart_send_sta;
+assign debug_out3 = uart_send_done;
+assign debug_out4 = {3'b0,uart_ctrl_send};
+assign debug_out5 = {3'b0,uart_ctrl_send_done};
+assign debug_out6 = uart_ctrl_data[15:8];
+assign debug_out7 = uart_ctrl_data[7:0];
 endmodule
