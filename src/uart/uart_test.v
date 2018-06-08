@@ -4,6 +4,7 @@ module uart_test(
 	input clk,
 	input rst,
 	input send_done,
+	input [39:0] InpData,
 	output wire send,
 	output wire [`SendToPC:0] data,
 	output wire [3:0] sta,
@@ -32,7 +33,7 @@ always @(posedge clk or negedge rst)begin
 					1:begin
 						status <= 2;
 						tosend<=1'b0;
-						Data<=40'b0000000000000000111111001111100111100111;
+						Data<=InpData;
 					end
 					2:begin
 						if(send_done==1'b1)begin
@@ -41,7 +42,7 @@ always @(posedge clk or negedge rst)begin
 						end
 						else begin
 							status<=2;
-							Data<=40'b0000000000000000111111001111100111100111;
+							//Data<=40'b0000000000000000111111001111100111100111;
 							tosend<=1'b1;
 						end
 					end
@@ -51,7 +52,7 @@ always @(posedge clk or negedge rst)begin
 					end
 					4:begin
 						tosend<=1'b0;
-						status <= 4;
+						status <= 0;
 					end
 					5:begin
 						tosend<=1'b0;

@@ -65,12 +65,6 @@ def parse_arguments():
         default='bowl.wav',
         help='WAV file (default: bowl.wav)')
     parser.add_argument(
-        '--keyboard', '-k',
-        metavar='FILE',
-        type=argparse.FileType('r'),
-        default='typewriter.kb',
-        help='keyboard file (default: typewriter.kb)')
-    parser.add_argument(
         '--verbose', '-v',
         action='store_true',
         help='verbose mode')
@@ -106,7 +100,7 @@ def main():
         if len(t)!=40:
             #t=t.zfill(40)
             continue
-        print t
+        #print t
         for i in range(0,40):
             if t[i]=='1' and last[i]=='0':
                 if not is_playing[i]:

@@ -208,6 +208,7 @@ uart_test __uart_test(
 	.rst(rst),
 	.send_done(uart_ctrl_send_done),
 	.send(uart_ctrl_send),
+	.InpData(key_down),
 	.data(uart_ctrl_data),
 	.sta(uart_test_sta),
 	.nxtsta(uart_test_nxtsta)

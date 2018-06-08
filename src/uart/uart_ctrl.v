@@ -173,7 +173,7 @@ always @(posedge clk or negedge rst)begin
 				end
 			end
 			11:begin
-				send_status<=11;
+				send_status<=0;
 				sendDone<=1'b1;
 				tosend<=1'b0;
 			end
