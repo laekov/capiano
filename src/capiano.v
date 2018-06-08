@@ -248,12 +248,12 @@ uart __uart(
 wire [31:0] _out;
 assign _out = {r_max[15:8], g_min[15:8], b_max[15:8], c_min[7:0]};
 // assign _out = {15'b0, cam0_en, cam_out[15:0]};
-assign debug_out0 = uart_test_sta;
-assign debug_out1 = uart_ctrl_sta;
-assign debug_out2 = uart_send_sta;
-assign debug_out3 = uart_send_done;
-assign debug_out4 = {3'b0,uart_ctrl_send};
-assign debug_out5 = {3'b0,uart_ctrl_send_done};
-assign debug_out6 = uart_ctrl_data[15:8];
-assign debug_out7 = uart_ctrl_data[7:0];
+assign debug_out0 = _out[3:0];
+assign debug_out1 = _out[7:4];
+assign debug_out2 = _out[11:8];
+assign debug_out3 = _out[15:12];
+assign debug_out4 = _out[19:16];
+assign debug_out5 = _out[23:20];
+assign debug_out6 = _out[27:24];
+assign debug_out7 = _out[31:28];
 endmodule

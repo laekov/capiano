@@ -101,11 +101,17 @@ def main():
             #t=t.zfill(40)
             continue
         #print t
+        nt=t[0:8][::-1]+t[8:16][::-1]+t[16:24][::-1]+t[24:32][::-1]+t[32:40][::-1]
+        t=nt
+        #L=[]
+        #print(len(t))
         for i in range(0,40):
             if t[i]=='1' and last[i]=='0':
                 if not is_playing[i]:
                     sounds[i].play(fade_ms=50)
                     is_playing[i]=True
+                    #L.append(i)
+                    #print(L)
             elif t[i]=='0' and last[i]=='1':
                 sounds[i].fadeout(50)
                 is_playing[i]=False
