@@ -51,6 +51,7 @@ def pitchshift(snd_array, n, window_size=2**13, h=2**11):
     """ Changes the pitch of a sound by ``n`` semitones. """
     factor = 2**(1.0 * n / 12.0)
     stretched = stretch(snd_array, 1.0/factor, window_size, h)
+    #return speedx(snd_array,factor)
     return speedx(stretched[window_size:], factor)
 
 
@@ -81,18 +82,29 @@ def main():
         warnings.simplefilter('ignore')
 
     fps, sound = wavfile.read(args.wav.name)
-
     tones = range(-20, 21)
-    sys.stdout.write('Transponding sound file... ')
+    sys.stdout.write('Loading sound file... ')
     sys.stdout.flush()
-    transposed_sounds = [pitchshift(sound, n) for n in tones]
+    #transposed_sounds = [pitchshift(sound, n) for n in tones]
+    sound_names=[]
+    transposed_sounds=[]
+    for i in range(36,76):
+        fps, sound = wavfile.read("sounds/German Concert D 0%d 083.wav"%(i))
+        sound=np.sum(sound,axis=1)
+        print(sound)
+        #print(sound)
+        #sound.play()
+        transposed_sounds.append(pitchshift(sound, 0))
     print('DONE')
     # So flexible ;)
     pygame.mixer.init(fps, -16, 1, 2048)
     sounds = map(pygame.sndarray.make_sound, transposed_sounds)
     is_playing = {k: False for k in range(0,40)}
-    #for i in range(0,100000000):
-    #    sounds[12].play(fade_ms=50)
+    '''
+    for i in range(0,40):
+        for j in range(0,100000):
+            sounds[0].play(fade_ms=50)
+    '''
     ser=serial.Serial("com4",9600,timeout=0.5)
     last="0000000000000000000000000000000000000000"
     while True:
@@ -108,7 +120,7 @@ def main():
         for i in range(0,40):
             if t[i]=='1' and last[i]=='0':
                 if not is_playing[i]:
-                    sounds[i].play(fade_ms=50)
+                    sounds[i].play()
                     is_playing[i]=True
                     #L.append(i)
                     #print(L)
